@@ -331,7 +331,7 @@
                             </div>
                         </div> -->
                         <div class="row" formArrayName="fscStd" >
-                            <div *ngFor="let standard of fscStanard; let i =index" class="col-lg-4 col-md-4 col-sm-6 col-xs-12" >
+                            <div *ngFor="let standard of fscstandardList; let i =index" class="col-lg-4 col-md-4 col-sm-6 col-xs-12" >
                                 <div class="checkbox">
                                     <input id="lineCheckbox{{ standard.id }}" (change)="onFscChange(standard.id, $event.target.checked)" type="checkbox" [value]="standard.id" >
                                     <label for="lineCheckbox{{ standard.id }}" >{{ standard.name }}</label>

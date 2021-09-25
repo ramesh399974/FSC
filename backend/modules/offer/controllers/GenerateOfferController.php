@@ -3880,6 +3880,7 @@ class GenerateOfferController extends \yii\rest\Controller
 					
 					$offerdetails['offer_status'] = $offermodel->status;
 					$offerdetails['taxname'] = $offermodel->taxname;
+					$offerdetails['tax_percentage'] = $offermodel->tax_percentage;
 					$offerdetails['offer_code'] = $offermodel->offer_code;
 					$offerdetails['updated_at'] = date($date_format,$offermodel->updated_at);
 

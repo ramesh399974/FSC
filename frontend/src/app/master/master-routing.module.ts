@@ -35,6 +35,27 @@ import { EditProductComponent } from './product/edit-product/edit-product.compon
 import { ListProductComponent } from './product/list-product/list-product.component';
 import { ViewProductComponent } from './product/view-product/view-product.component';
 
+import { AddFscProductComponent } from './fsc-product/add-fsc-product/add-fsc-product.component';
+import { EditFscProductComponent } from './fsc-product/edit-fsc-product/edit-fsc-product.component';
+import { ListFscProductComponent } from './fsc-product/list-fsc-product/list-fsc-product.component';
+import { ViewFscProductComponent } from './fsc-product/view-fsc-product/view-fsc-product.component';
+
+import { AddFscProducttypeL1Component } from './fsc-producttype-l1/add-fsc-producttype-l1/add-fsc-producttype-l1.component';
+import { EditFscProducttypeL1Component } from './fsc-producttype-l1/edit-fsc-producttype-l1/edit-fsc-producttype-l1.component';
+import { ListFscProducttypeL1Component } from './fsc-producttype-l1/list-fsc-producttype-l1/list-fsc-producttype-l1.component';
+import { ViewFscProducttypeL1Component } from './fsc-producttype-l1/view-fsc-producttype-l1/view-fsc-producttype-l1.component';
+
+import { AddFscProducttypeL2Component } from './fsc-producttype-l2/add-fsc-producttype-l2/add-fsc-producttype-l2.component';
+import { EditFscProducttypeL2Component } from './fsc-producttype-l2/edit-fsc-producttype-l2/edit-fsc-producttype-l2.component';
+import { ListFscProducttypeL2Component } from './fsc-producttype-l2/listt-fsc-producttype-l2/list-fsc-producttype-l2.component';
+import { ViewFscProducttypeL2Component } from './fsc-producttype-l2/view-fsc-producttype-l2/view-fsc-producttype-l2.component';
+
+import { AddFscProducttypeL3Component } from './fsc-producttype-l3/add-fsc-producttype-l3/add-fsc-producttype-l3.component';
+import { EditFscProducttypeL3Component } from './fsc-producttype-l3/edit-fsc-producttype-l3/edit-fsc-producttype-l3.component';
+import { ViewFscProducttypeL3Component } from './fsc-producttype-l3/view-fsc-producttype-l3/view-fsc-producttype-l3.component';
+import { ListFscProducttypeL3Component } from './fsc-producttype-l3/list-fsc-producttype-l3/list-fsc-producttype-l3.component';
+
+
 import { AddProcessComponent } from './process/add-process/add-process.component';
 import { EditProcessComponent } from './process/edit-process/edit-process.component';
 import { ListProcessComponent } from './process/list-process/list-process.component';
@@ -219,6 +240,18 @@ const masterRoutes: Routes = [
   { path: 'master/producttype/add',  component: AddProducttypeComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'add_product_description', roles: [Role.Admin] } },
   { path: 'master/producttype/edit',  component: EditProducttypeComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_product_description',  roles: [Role.Admin] } },
   { path: 'master/producttype/list',  component: ListProducttypeComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'product_description_master',  roles: [Role.Admin] } },
+
+  { path: 'master/fsc-producttype-l1/add',  component: AddFscProducttypeL1Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'add_fsc_product_l1_description', roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l1/edit',  component: EditFscProducttypeL1Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_fsc_product_l1_description',  roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l1/list',  component: ListFscProducttypeL1Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'fsc_product_l1_description_master',  roles: [Role.Admin] } },
+
+  { path: 'master/fsc-producttype-l2/add',  component: AddFscProducttypeL2Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'add_fsc_product_l2_description', roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l2/edit',  component: EditFscProducttypeL2Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_fsc_product_l2_description',  roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l2/list',  component: ListFscProducttypeL2Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'fsc_product_l2_description_master',  roles: [Role.Admin] } },
+
+  { path: 'master/fsc-producttype-l3/add',  component: AddFscProducttypeL3Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'add_fsc_product_l3_description', roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l3/edit',  component: EditFscProducttypeL3Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_fsc_product_l3_description',  roles: [Role.Admin] } },
+  { path: 'master/fsc-producttype-l3/list',  component: ListFscProducttypeL3Component,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'fsc_product_l3_description_master',  roles: [Role.Admin] } },
      
   { path: 'master/user/add',  component: AddUserComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1,3],userCanAccess:[3], rules:Rule.AddUser, roles: [Role.Admin] } },
   { path: 'master/user/edit',  component: EditUserComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1,3], userCanAccess:[1,3], rules:Rule.UserMaster, roles: [Role.Admin] } },
@@ -272,6 +305,11 @@ const masterRoutes: Routes = [
   { path: 'master/product/edit',  component: EditProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_product_category', roles: [Role.Admin] } },
   { path: 'master/product/list',  component: ListProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'product_category_master', roles: [Role.Admin] } },
   { path: 'master/product/view',  component: ViewProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'product_category_master', roles: [Role.Admin] } },
+
+  { path: 'master/fsc-product/add',  component: AddFscProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'add_fsc_product', roles: [Role.Admin] } },
+  { path: 'master/fsc-product/edit',  component: EditFscProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_fsc_product', roles: [Role.Admin] } },
+  { path: 'master/fsc-product/list',  component: ListFscProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'fsc_product_master', roles: [Role.Admin] } },
+  { path: 'master/fsc-product/view',  component: ViewFscProductComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'fsc_product_master', roles: [Role.Admin] } },
   
   { path: 'master/process/add',  component: AddProcessComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'add_process', roles: [Role.Admin] } },
   { path: 'master/process/edit',  component: EditProcessComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_process', roles: [Role.Admin] } },

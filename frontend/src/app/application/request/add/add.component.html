@@ -319,7 +319,7 @@
 											<label for="inlineCheckbox{{ standard.id }}" >{{ standard.name }}</label>
 										</div>
 									</div> -->
-									<div *ngFor="let standard of fscStanard; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
+									<div *ngFor="let standard of fscstandardList; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
 										<div class="checkbox" style="margin-bottom: 5px;">
 											<input id="lineCheckbox{{standard.id}}" [checked]="this.standardsChkDb.includes(standard.id)?true:false"  (change)="onFscChange(standard.id, $event.target.checked)" type="checkbox" [value]="standard.id" >
 											<label for="lineCheckbox{{ standard.id }}" >{{ standard.name }}</label>
@@ -329,10 +329,10 @@
 								<div *ngIf="appstandardErrors" class="validationerror" >
                                 {{ appstandardErrors }}
 								</div>  
-								<h3 *ngIf="cocCheck">FSC COC <span class="text-danger">*</span></h3>
-							<div  *ngIf="cocCheck" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
+								<h3 *ngIf="selStandardIds.length>0">FSC COC <span class="text-danger">*</span></h3>
+							<div  *ngIf="selStandardIds.length>0" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
 								<div class="row"  formArrayName="coc">
-				                     <div *ngFor="let cocstd of cocStandard; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
+				                     <div *ngFor="let cocstd of fscSubStandardList; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
 										<div  class="checkbox"   style="margin-bottom: 5px;">
 											<input type="checkbox" [class.disabled-content-checkbox]="(i=='0')?true:false"  [id]="cocstd.name"  (change)="onCocChange(cocstd.id, $event.target.checked)" [checked]="this.cockey.includes(cocstd.id)?true:false" [value]='cocstd.name'  >
 											<label [for]="cocstd.name" [class.disabled-content-checkbox]="(i=='0')?true:false" >{{ cocstd.name }} </label>
@@ -343,8 +343,8 @@
                                 {{ cocError }}
 								</div>  
 							</div>
-							<h3 *ngIf="cocSubCheck && cocCheck">FSC-STD-40-003 V2-1  <span class="text-danger">*</span></h3>
-							<div *ngIf="cocSubCheck && cocCheck" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
+							<h3 *ngIf="cocSubCheck && selStandardIds.includes('1')">FSC-STD-40-003 V2-1  <span class="text-danger">*</span></h3>
+							<div *ngIf="cocSubCheck && selStandardIds.includes('1')" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
 								<div class="row" >
 				                     <div *ngFor="let cocSubStd of cocSubStandard; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
 										<div  class="radio"  style="margin-bottom: 5px;">
@@ -357,7 +357,7 @@
                                 {{ fscError }}
 								</div>  
 							</div>
-							<h3 *ngIf="projectCertification">FSC Project certification <span class="text-danger">*</span></h3>
+							<!-- <h3 *ngIf="projectCertification">FSC Project certification <span class="text-danger">*</span></h3>
 							<div *ngIf="projectCertification" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
 								<div class="row" >
 				                     <div *ngFor="let project of projectCertificationStandard; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
@@ -440,7 +440,7 @@
 							</div>
 							<div *ngIf="projectCertError" class="validationerror" > 
                                 {{ projectCertError }}
-								</div> 
+								</div>  -->
 															
 							</div>
 						</div> 

@@ -51,8 +51,11 @@
 						<!--<li *ngIf="checkRole('offer_template_master')" ><a [routerLink]="['/master/offertemplate/list']"><i class="fa fa-circle-o"></i> Offer Template Master</a></li>-->
 											
 						<li *ngIf="checkRole('product_category_master')"><a [routerLink]="['/master/product/list']"><i class="fa fa-circle-o"></i> Product Category</a></li>
+						
 						<li *ngIf="checkRole('product_description_master')"><a [routerLink]="['/master/producttype/list']"><i class="fa fa-circle-o"></i> Product Description</a></li>
 						<li *ngIf="checkRole('material_master')"><a [routerLink]="['/master/materialcomposition/list']"><i class="fa fa-circle-o"></i> Material</a></li>
+						<li *ngIf="checkRole('fsc_product_master')"><a [routerLink]="['/master/fsc-product/list']"><i class="fa fa-circle-o"></i> FSC Product</a></li>
+						<li *ngIf="checkRole('fsc_product_l1_description_master')"><a [routerLink]="['/master/fsc-producttype-l1/list']"><i class="fa fa-circle-o"></i> FSC Product L-1 Description</a></li>
 																	
 						<li *ngIf="checkRole('process_master')" ><a [routerLink]="['/master/process/list']"><i class="fa fa-circle-o"></i> Process</a></li>
 						<!-- <li *ngIf="checkRole('process_master')" ><a [routerLink]="['/master/list-audit-standard']"><i class="fa fa-circle-o"></i> Audit Standard</a></li> -->

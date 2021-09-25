@@ -2,6 +2,7 @@ import { Component, OnInit,ViewChild,EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl,FormArray,NgForm,NgControl, Form, NumberValueAccessor } from '@angular/forms';
 import { CountryService } from '@app/services/country.service';
 import { StandardService } from '@app/services/standard.service';
+import { FscStandardService } from '@app/services/master/fsc-standard/fsc-standard.service';
 import { Router,ActivatedRoute ,Params } from '@angular/router';
 import { EnquiryDetailService } from '@app/services/enquiry-detail.service';
 import { ProductService } from '@app/services/master/product/product.service'
@@ -70,7 +71,8 @@ export class AddComponent implements OnInit {
   brandlist: any;
   app_type: any;
   loadingFile: boolean; 
-  constructor(public brandService: BrandService,private reductionstandard:ReductionStandardService,private modalService: NgbModal,private BusinessSectorService: BusinessSectorService, private router:Router,private processService:ProcessService, private fb:FormBuilder,
+  fscSubStandardList: any;
+  constructor(public brandService: BrandService,public fscstandards: FscStandardService,private reductionstandard:ReductionStandardService,private modalService: NgbModal,private BusinessSectorService: BusinessSectorService, private router:Router,private processService:ProcessService, private fb:FormBuilder,
     private productService:ProductService,private countryservice: CountryService,
     private standards: StandardService, public enquiry:EnquiryDetailService,public errorSummary: ErrorSummaryService,
     private authservice:AuthenticationService,private activatedRoute:ActivatedRoute,public standardAdditionService:StandardAdditionService,public applicationDetailService:ApplicationDetailService, private CbService:CbService) { }
@@ -83,6 +85,7 @@ export class AddComponent implements OnInit {
   stateList:State[];
   unitStateList:State[];
   standardList:Standard[];
+  fscstandardList : Standard[];
   fscStanard = [{id: 1, name: "FSC Chain Of Custody", code: "COC"}];
   cocStandard = [
     {id: "1", name: "FSC-STD-40-004 V3-0" }, 
@@ -400,6 +403,15 @@ export class AddComponent implements OnInit {
     this.brandService.getData().subscribe(res=>{
       this.brandlist = res.data;
     });
+
+    this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
+      this.fscstandardList = ress['standards'];
+    })
+
+    this.fscstandards.getFscSubStandard().pipe(first()).subscribe(res => {
+      this.fscSubStandardList = res['standards'];
+    })
+
 	// -------------- Code Start Here for Renewal Audit -----------------
 	
 	//this.standardAdditionList=['1'];
@@ -864,7 +876,7 @@ export class AddComponent implements OnInit {
                 });
               }
               res.standards.forEach(val=>{
-                this.standardsChkDb.push(val);
+                this.standardsChkDb.push(""+val+"");
                 this.selStandardIds.push(""+val+"");
                 
               });
@@ -3007,16 +3019,19 @@ export class AddComponent implements OnInit {
     //const emailFormArray = <FormArray>this.myForm.controls.useremail;
     //const standardsFormArray = <FormArray>this.enquiryForm.get('company.standardsChk');
     const standardsFormArray = <FormArray>this.enquiryForm.get('fscChk');
-    let fscStandardDetails = this.fscStanard.find(x => x.id == id);
+    let fscStandardDetails = this.fscstandardList.find(x => x.id == id);
     this.enquiryForm.patchValue({tradeName:'',labelFsc_grade:''});
     if (isChecked) {
       standardsFormArray.push(new FormControl(id));
       this.selFscStandardList.push({id:fscStandardDetails.id,name:fscStandardDetails.name});
+      this.selStandardIds.push(""+id+"");
     } else {
       let index = standardsFormArray.controls.findIndex(x => x.value == id);
       standardsFormArray.removeAt(index);
       this.selFscStandardList = this.selFscStandardList.filter(x => x.id != id);
+      this.selStandardIds = this.selStandardIds.filter(x=>x !=id);
     }
+    // console.log(this.selStandardIds)
     this.standardsLength = this.enquiryForm.get('fscChk').value.length;
     if(id ==1 ) {
       this.cocCheck = !this.cocCheck;
@@ -3054,7 +3069,7 @@ export class AddComponent implements OnInit {
     this.cockey= this.selCocStandardList.map(prodType => prodType.id);
     // this.standardsLength = this.enquiryForm.get('fscChk').value.length;
     this.cocError = ''
-    if(id ==3 &&  this.cocCheck == true  && value == true) {
+    if(id ==3 && value == true) {
       this.cocSubCheck = true;
     } else if(id==3 && value == false){
       this.cocSubCheck = false;

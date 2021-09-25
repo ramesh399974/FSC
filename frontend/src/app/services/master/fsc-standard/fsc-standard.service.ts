@@ -27,4 +27,13 @@ export class FscStandardService {
   updateData(formData): Observable<any>{
     return this.http.post<any>(`${environment.apiUrl}/master/fsc-standard/update`, formData,this.httpOptions);
   }
+
+  getFscStandard(): Observable<Standard[]>{
+    return this.http.get<Standard[]>(`${environment.apiUrl}/master/fsc-standard/get-fsc-standard`);
+  }
+
+  getFscSubStandard(): Observable<Standard[]>
+  {
+    return this.http.get<Standard[]>(`${environment.apiUrl}/master/fsc-sub-standard/get-fsc-sub-standard`);
+  }
 }

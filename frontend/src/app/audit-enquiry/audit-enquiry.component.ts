@@ -14,6 +14,7 @@ import { first } from 'rxjs/operators';
 import { ErrorSummaryService } from '@app/helpers/errorsummary.service';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import * as $ from 'jquery';
+import { FscStandardService } from '@app/services/master/fsc-standard/fsc-standard.service';
 
 @Component({
   selector: 'app-audit-enquiry',
@@ -38,6 +39,7 @@ export class AuditEnquiryComponent implements OnInit {
   error ='';
   recaptchaErrors = '';
   recaptchaResponseStatus=true;
+  fscstandardList: any=[];
 	/*
   resolved(captchaResponse: string) {
        	this.recaptchaResponseStatus=true;
@@ -45,7 +47,7 @@ export class AuditEnquiryComponent implements OnInit {
   }	
   */
 
-  constructor(private fb:FormBuilder,private countryservice: CountryService,private standards: StandardService, private enquiry:EnquiryDetailService,private errorSummary: ErrorSummaryService,private recaptchaV3Service: ReCaptchaV3Service) { }
+  constructor(private fb:FormBuilder,public fscstandards: FscStandardService,private countryservice: CountryService,private standards: StandardService, private enquiry:EnquiryDetailService,private errorSummary: ErrorSummaryService,private recaptchaV3Service: ReCaptchaV3Service) { }
 
   
 
@@ -79,6 +81,9 @@ export class AuditEnquiryComponent implements OnInit {
       */
       
     });
+    this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
+      this.fscstandardList = ress['standards'];
+    })
 
     this.enquiryForm = this.fb.group({
 
