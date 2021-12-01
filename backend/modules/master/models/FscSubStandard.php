@@ -57,4 +57,9 @@ class FscSubStandard extends \yii\db\ActiveRecord
             'name' => 'Name',
         ];
     }
+
+    public function getFscstandard()
+    {
+        return $this->hasOne(FscStandard::className(),['id'=>'fsc_standard_id']);
+    }
 }

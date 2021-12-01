@@ -71,6 +71,10 @@ import { EditFscStandardComponent } from './fsc-standard/edit-fsc/edit-fsc-stand
 import { ListFscStandardComponent } from './fsc-standard/list-fsc/list-fsc-standard.component';
 import { ViewFscStandardComponent } from './fsc-standard/view-fsc/view-fsc-standard.component';
 
+import { AddFscSubStandardComponent } from './fsc-sub-standard/add-fsc-sub-standard/add-fsc-sub-standard.component';
+import { EditFscSubStandardComponent } from './fsc-sub-standard/edit-fsc-sub-standard/edit-fsc-sub-standard.component';
+import { ListFscSubStandardComponent } from './fsc-sub-standard/list-fsc-sub-standard/list-fsc-sub-standard.component';
+import { ViewFscSubStandardComponent } from './fsc-sub-standard/view-fsc-sub-standard/view-fsc-sub-standard.component';
 
 import { AddChecklistComponent } from './checklist/add-checklist/add-checklist.component';
 import { EditChecklistComponent } from './checklist/edit-checklist/edit-checklist.component';
@@ -325,6 +329,12 @@ const masterRoutes: Routes = [
   { path: 'master/fsc-standard/edit-fsc',  component: EditFscStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'edit_standard', roles: [Role.Admin] } },
   { path: 'master/fsc-standard/list-fsc',  component: ListFscStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1], rules:'standard_master', roles: [Role.Admin] } },
   { path: 'master/fsc-standard/view-fsc',  component: ViewFscStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'standard_master', roles: [Role.Admin] } },
+
+  { path: 'master/fsc-sub-standard/list',  component: ListFscSubStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'add_standard', roles: [Role.Admin] } },
+  { path: 'master/fsc-sub-standard/add',  component: AddFscSubStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'add_standard', roles: [Role.Admin] } },
+  { path: 'master/fsc-sub-standard/view',  component: ViewFscSubStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'add_standard', roles: [Role.Admin] } },
+  { path: 'master/fsc-sub-standard/edit',  component: EditFscSubStandardComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1], rules:'add_standard', roles: [Role.Admin] } },
+  
   
   { path: 'master/checklist/add',  component: AddChecklistComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: {usertype:[1] , roles: [Role.Admin] } },
   { path: 'master/checklist/edit',  component: EditChecklistComponent,canLoad: [AuthGuard],canActivate: [AuthGuard],data: { usertype:[1] , roles: [Role.Admin] } },

@@ -2,6 +2,8 @@
 namespace app\modules\master\controllers;
 
 use app\modules\master\models\FscProducttypeL1;
+use app\modules\master\models\FscProducttypeL2;
+use app\modules\master\models\FscProducttypeL3;
 
 use Yii;
 
@@ -9,7 +11,7 @@ use yii\web\NotFoundHttpException;
 
 use sizeg\jwt\Jwt;
 use sizeg\jwt\JwtHttpBearerAuth;
-class FscProducttypeL1Controller extends \yii\rest\Controller
+class FscProducttypeL3Controller extends \yii\rest\Controller
 {
     public function behaviors()
     {
@@ -31,7 +33,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
     public function actionCreate()
     {
-		if(!Yii::$app->userrole->hasRights(array('add_fsc_product_description')))
+		if(!Yii::$app->userrole->hasRights(array('add_fsc_product_l3_description')))
 		{
 			return false;
 		}
@@ -40,8 +42,8 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 		$responsedata=array('status'=>0,'message'=>'Failed');
 		if ($data) 
 		{
-			$model = new FscProducttypeL1();
-			$model->fsc_product_id=$data['product_id'];
+			$model = new FscProducttypeL3();
+			$model->fsc_product_type_l2_id=$data['product_id'];
 			$model->name=$data['name'];
 			$model->code=$data['code'];
 			//$model->code='';
@@ -62,7 +64,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
     public function actionIndex()
     {
-		if(!Yii::$app->userrole->hasRights(array('fsc_product_l1_description_master')))
+		if(!Yii::$app->userrole->hasRights(array('fsc_product_l3_description_master')))
 		{
 			return false;
 		}
@@ -71,8 +73,8 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
         //return ['data'=>$model];
 		$post = yii::$app->request->post();
 		$date_format = Yii::$app->globalfuns->getSettings('date_format');
-		$model = FscProducttypeL1::find()->where(['<>','t.status',2])->alias('t');
-		$model->joinWith(['fscproduct as prd']);
+		$model = FscProducttypeL3::find()->where(['<>','t.status',2])->alias('t');
+		$model->joinWith(['fscproducttypetwo as prd']);
 		
 		$model = $model->groupBy(['t.id']);
 		if(is_array($post) && count($post)>0 && isset($post['page']) && isset($post['pageSize']))
@@ -121,7 +123,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 			{
 				$data=array();
 				$data['id']=$producttype->id;
-				$data['product']=$producttype->fscproduct->name;
+				$data['product']=$producttype->fscproducttypetwo->name;
 				$data['name']=$producttype->name;
 				$data['code']=$producttype->code;
 				$data['status']=$producttype->status;
@@ -135,7 +137,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
 	public function actionUpdate()
     {
-		if(!Yii::$app->userrole->hasRights(array('edit_fsc_product_description')))
+		if(!Yii::$app->userrole->hasRights(array('edit_fsc_product_l3_description')))
 		{
 			return false;
 		}
@@ -144,7 +146,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 		$responsedata=array('status'=>0,'message'=>'Something went wrong! Please try again');
 		if ($data) 
 		{
-			$model = FscProducttypeL1::find()->where(['id' => $data['id']])->one();
+			$model = FscProducttypeL3::find()->where(['id' => $data['id']])->one();
 			if ($model !== null)
 			{
 				$model->fsc_product_id=$data['product_id'];
@@ -169,7 +171,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
     public function actionView()
     {
-		if(!Yii::$app->userrole->hasRights(array('fsc_product_l1_description_master')))
+		if(!Yii::$app->userrole->hasRights(array('fsc_product_l3_description_master')))
 		{
 			return false;
 		}
@@ -194,12 +196,12 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
 			$status = $data['status'];	
 
-			if(!Yii::$app->userrole->canDoCommonUpdate($status,'fsc_product_l1_description_master'))
+			if(!Yii::$app->userrole->canDoCommonUpdate($status,'fsc_product_l3_description_master'))
 			{
 				return false;
 			}	
 
-           	$model = FscProducttypeL1::find()->where(['id' => $id])->one();
+           	$model = FscProducttypeL3::find()->where(['id' => $id])->one();
 			if ($model !== null)
 			{
 				$model->status=$data['status'];
@@ -256,7 +258,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
 	protected function findModel($id)
     {
-        if (($model = FscProducttypeL1::findOne($id)) !== null) {
+        if (($model = FscProducttypeL3::findOne($id)) !== null) {
             return $model;
         }
 
@@ -265,7 +267,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
 	public function actionGetProduct()
 	{
-		$Product = FscProducttypeL1::find()->select(['id','name'])->where(['status'=>0])->asArray()->all();
+		$Product = FscProducttypeL2::find()->select(['id','name'])->where(['status'=>0])->asArray()->all();
 		return ['products'=>$Product];
 	}
 }

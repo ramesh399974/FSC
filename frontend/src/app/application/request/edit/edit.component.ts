@@ -22,6 +22,7 @@ import { BusinessSectorGroup } from '@app/models/master/business-sector-group';
 import { ProductType } from '@app/models/master/producttype';
 import { MaterialComposition } from '@app/models/master/materialcomposition';
 import { MaterialType } from '@app/models/master/materialtype';
+import { FscProductService } from '@app/services/master/fsc-product/fsc-product.service';
 
 import { tap,map, startWith,first,switchMap } from 'rxjs/operators'; 
 //import { FileUploader, FileLikeObject } from 'ng2-file-upload';
@@ -73,9 +74,15 @@ export class EditComponent implements OnInit {
   loadingFile: boolean;
   fscstandardList: any;
   fscSubStandardList: any;
+  fscproductList: any;
+  fscproductTypeOneList: any[];
+  fscproductTypeTwoList: any[];
+  fscproductTypeList: any;
+  fscproductstandard_error: string;
 
   constructor(public brandService: BrandService,public fscstandards: FscStandardService,private reductionstandard:ReductionStandardService,private modalService: NgbModal,private router:Router,private BusinessSectorService: BusinessSectorService,private processService:ProcessService,private activatedRoute:ActivatedRoute, 
     private fb:FormBuilder,private productService:ProductService,
+    private fscproductservice : FscProductService,
     private countryservice: CountryService,private standards: StandardService,
      public enquiry:EnquiryDetailService,public errorSummary:ErrorSummaryService,public standardAdditionService:StandardAdditionService,public applicationDetailService:ApplicationDetailService, private CbService:CbService) 
   { }
@@ -221,6 +228,10 @@ export class EditComponent implements OnInit {
     this.fscstandards.getFscSubStandard().pipe(first()).subscribe(res => {
       this.fscSubStandardList = res['standards'];
     })
+
+    this.fscproductservice.getProductList().subscribe(res => {
+      this.fscproductList = res['products'];      
+    });
 
     this.getBSectorStandardWise();
     this.enquiry.getEnquiryDetails(this.id).
@@ -538,10 +549,13 @@ export class EditComponent implements OnInit {
       material_type:['',[Validators.required]],
       material_percentage:['',[Validators.required,Validators.pattern('^[0-9]+(\.[0-9]{1,2})?$'),Validators.max(100)]],
       composition_standard:['',[Validators.required]],
+      fsc_composition_standard:['',[Validators.required]],
       label_grade:['',[Validators.required]],
       productFsc:['',[Validators.required]],
       productSubDescription:['',[Validators.required]],
       productFsc_type:['',[Validators.required]],
+      productFsc_type_two:['',[Validators.required]],
+      productFsc_type_three:['',[Validators.required]],
       Species:['',[Validators.required]],
       tradeName:['',[Validators.required]],
       labelFsc_grade:['',[Validators.required]],
@@ -771,6 +785,54 @@ export class EditComponent implements OnInit {
 		});
 	}	
   }
+
+  getProductOneType(productid){
+    	
+    this.fscproductTypeOneList = [];
+    this.fscproductTypeTwoList = [];
+    this.enquiryForm.patchValue({productFsc_type:'',productFsc_type_two:'',productFsc_type_three:''});
+      
+    if(productid>0)
+    {	
+      this.loading['fscproducttype'] = 1;
+      
+      this.fscproductservice.getFscProductTypes(productid).pipe(first()).subscribe(res => {
+        this.fscproductTypeList = res['data']; 
+        this.fscproductTypeOneList = [];
+        this.fscproductTypeTwoList = [];
+        this.loading['fscproducttype'] = 0;
+      });
+    }	
+    }
+
+    getFscProductTwoType(productid){
+    	
+      this.fscproductTypeTwoList = [];
+      this.enquiryForm.patchValue({productFsc_type_two:'',productFsc_type_three:''});
+        
+      if(productid>0)
+      {	
+        this.loading['fscproducttypeone'] = 1;
+        
+        this.fscproductservice.getFscProductTypesOne(productid).pipe(first()).subscribe(res => {
+          this.fscproductTypeOneList = res['data']; 
+          this.fscproductTypeTwoList = [];
+          this.loading['fscproducttypeone'] = 0;
+        });
+      }	
+      }
+
+      getFscProductThreeType(productid){
+        if(productid>0)
+        {	
+          this.loading['fscproducttypetwo'] = 1;
+          this.fscproductservice.getFscProductTypesTwo(productid).pipe(first()).subscribe(res => {
+            this.fscproductTypeTwoList = res['data']; 
+            this.loading['fscproducttypetwo'] = 0;
+          });
+        }	
+        }
+
   getProductTypeOnEdit(productid,product_typeid){
     this.loading['producttype'] = 1;
     this.productService.getProductTypes(productid).pipe(first()).subscribe(res => {
@@ -1034,6 +1096,11 @@ export class EditComponent implements OnInit {
     if(index !== -1)
       this.productStandardList.splice(index,1);
   }
+  removeFscProductStandard(standardId:number) {
+    let index= this.productFscStandardList.findIndex(s => s.standard_id ==  standardId);
+    if(index !== -1)
+      this.productFscStandardList.splice(index,1);
+  }
   touchProductStandard(){
     this.f.composition_standard.markAsTouched();
     this.f.label_grade.markAsTouched();
@@ -1096,6 +1163,24 @@ export class EditComponent implements OnInit {
 	
 	  this.std_with_product_std_error='';
   }
+  touchFscProductStandard(){
+    this.f.fsc_composition_standard.markAsTouched();
+  }
+fscproductstandardgrade_error ='';
+addFscProductStandard(){
+  this.f.fsc_composition_standard.setValidators([Validators.required]);
+  this.f.fsc_composition_standard.updateValueAndValidity();
+  this.touchFscProductStandard();
+
+  this.fscproductstandard_error = '';
+
+  let fsc_product_stand_id = this.enquiryForm.get('fsc_composition_standard').value;
+
+  this.fscproductstandardgrade_error='';
+
+  
+
+}
   editProductStandard(standardId:number){
     let prd= this.productStandardList.find(s => s.standard_id ==  standardId);
 

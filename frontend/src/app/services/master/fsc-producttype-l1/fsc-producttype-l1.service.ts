@@ -32,4 +32,10 @@ export class FscProducttypeL1Service {
   updateData(formData): Observable<any>{
     return this.http.post<any>(`${environment.apiUrl}/master/fsc-producttype-l1/update`, formData,this.httpOptions);
   }
+
+  getProductList(): Observable<FscProductType[]>{
+    return this.http.get<FscProductType[]>(`${environment.apiUrl}/master/fsc-producttype-l1/get-product`);
+  } 
+
+  
 }

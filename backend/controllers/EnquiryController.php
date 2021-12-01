@@ -340,15 +340,15 @@ class EnquiryController extends \yii\rest\Controller
 					$resultarr[$key]=$value;
 				}
 
-				$Enqstdmodel = $enquirymodeldata->enquirystandard;
+				$Enqstdmodel = $enquirymodeldata->enquiryfscstandard;
 				$eStandardArr= array();
 				if(count($Enqstdmodel)>0)
 				{
 					foreach($Enqstdmodel as $enquirystandard)
 					{
 						$data=array();
-						$data['id']=$enquirystandard->standard->id;
-						$data['name']=$enquirystandard->standard->name;
+						$data['id']=$enquirystandard->fscstandard->id;
+						$data['name']=$enquirystandard->fscstandard->name;
 						$eStandardArr[]=$data;
 					}
 				}

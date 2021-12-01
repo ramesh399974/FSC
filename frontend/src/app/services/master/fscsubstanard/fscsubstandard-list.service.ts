@@ -4,14 +4,16 @@ import { throwError,BehaviorSubject, Observable, of, Subject,pipe } from 'rxjs';
 import { catchError, debounceTime, delay, switchMap, tap,map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { ErrorSummaryService } from '@app/helpers/errorsummary.service';
+
 import {DecimalPipe} from '@angular/common';
 import {SortDirection} from '@app/helpers/sortable.directive';
-import {FscProductType} from '@app/models/master/FscProductType';
+import { FscSubStandard } from '@app/models/master/FscSubStandard';
 
 interface SearchResult {
-  producttypes: FscProductType[];
+  standards: FscSubStandard[];
   total: number;
 }
+
 interface State {
   page: number;
   pageSize: number;
@@ -25,21 +27,21 @@ function compare(v1, v2) {
   return v1 < v2 ? -1 : v1 > v2 ? 1 : 0;
 }
 
-function sort(producttypes: FscProductType[], column: string, direction: string): FscProductType[] {
+function sort(standards: FscSubStandard[], column: string, direction: string): FscSubStandard[] {
   //console.log('234324');
   if (direction === '') {
-    return producttypes;
+    return standards;
   } else {
-    return [...producttypes].sort((a, b) => {
+    return [...standards].sort((a, b) => {
       const res = compare(a[column], b[column]);
       return direction === 'asc' ? res : -res;
     });
   }
 }
 
-function matches(producttype: FscProductType, term: string, pipe: PipeTransform) {
+function matches(standard: FscSubStandard, term: string, pipe: PipeTransform) {
 
-  //return producttype.name.toLowerCase().includes(term.toLowerCase());
+  return standard.name.toLowerCase().includes(term.toLowerCase());
   /*return country.name.toLowerCase().includes(term.toLowerCase())
     || pipe.transform(country.area).includes(term)
     || pipe.transform(country.population).includes(term);
@@ -47,14 +49,14 @@ function matches(producttype: FscProductType, term: string, pipe: PipeTransform)
 }
 
 
+
 @Injectable({
   providedIn: 'root'
 })
-export class FscProducttypeL2ListService {
-
+export class FscSubStandardListService {
   private _loading$ = new BehaviorSubject<boolean>(true);
   private _search$ = new Subject<void>();
-  private _producttypes$ = new BehaviorSubject<FscProductType[]>([]);
+  private _standards$ = new BehaviorSubject<FscSubStandard[]>([]);
   private _total$ = new BehaviorSubject<number>(0);
 
   private _state: State = {
@@ -66,7 +68,7 @@ export class FscProducttypeL2ListService {
   };
 
   constructor( private http:HttpClient,public errorSummary: ErrorSummaryService) {
-	this._state.pageSize=this.errorSummary.pageLimit; 
+    this._state.pageSize=this.errorSummary.pageLimit;	  
     this._search$.pipe(
       tap(() => this._loading$.next(true)),
       //debounceTime(200),
@@ -74,7 +76,7 @@ export class FscProducttypeL2ListService {
       //delay(200),
       tap(() => this._loading$.next(false))
     ).subscribe(result => {
-      this._producttypes$.next(result.producttypes);
+      this._standards$.next(result.standards);
       this._total$.next(result.total);
     });
 
@@ -87,7 +89,7 @@ export class FscProducttypeL2ListService {
     })
   };
   
-  get producttypesone$() { return this._producttypes$.asObservable(); }
+  get standards$() { return this._standards$.asObservable(); }
   get total$() { return this._total$.asObservable(); }
   get loading$() { return this._loading$.asObservable(); }
   get page() { return this._state.page; }
@@ -126,27 +128,27 @@ export class FscProducttypeL2ListService {
     params = params.append('page', ''+page);
     params = params.append('pageSize', ''+pageSize);
     */
+    
 
-    return this.http.post<SearchResult>(`${environment.apiUrl}/master/fsc-producttype-l2/index`,{page,pageSize,searchTerm,sortColumn,sortDirection}).pipe(
+    return this.http.post<SearchResult>(`${environment.apiUrl}/master/fsc-sub-standard/index`,{page,pageSize,searchTerm,sortColumn,sortDirection}).pipe(
         map(result => {
-          return {producttypes:result.producttypes,total:result.total};
+          return {standards:result.standards,total:result.total};
         })
     );
 
   }
 
-  addProductType(producttypeData){
+addStandard(standardData){
     //return [{id:1, name:'USA'},{id:2, name:'India'}];
-    //let producttypeDatas = Object.assign({}, producttypeData);
-    return this.http.post<any>(`${environment.apiUrl}/master/fsc-producttype-l2/create`, producttypeData);
+    //let standardDatas = Object.assign({}, standardData);
+return this.http.post<any>(`${environment.apiUrl}/master/fsc-sub-standard/create`, standardData);
     //, JSON.stringify(data)
-  }
+}
 
-  getProductType():Observable<any>{
+  getStandard():Observable<any>{
     
-    return this.http.get<any>(`${environment.apiUrl}/master/fsc-producttype-l2/index`,this.httpOptions);
-    
-  }
+    return this.http.get<any>(`${environment.apiUrl}/master/fsc-sub-standard/index`,this.httpOptions);
+     }
 
 
 
@@ -167,6 +169,6 @@ export class FscProducttypeL2ListService {
   };
 
   commonActionData(data): Observable<any>{
-    return this.http.post<any>(`${environment.apiUrl}/master/fsc-producttype-l2/common-update`,data);
-  }
+    return this.http.post<any>(`${environment.apiUrl}/master/fsc-sub-standard/common-update`,data);
+  } 
 }

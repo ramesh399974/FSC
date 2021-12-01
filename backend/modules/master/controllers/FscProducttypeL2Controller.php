@@ -2,6 +2,7 @@
 namespace app\modules\master\controllers;
 
 use app\modules\master\models\FscProducttypeL1;
+use app\modules\master\models\FscProducttypeL2;
 
 use Yii;
 
@@ -9,7 +10,7 @@ use yii\web\NotFoundHttpException;
 
 use sizeg\jwt\Jwt;
 use sizeg\jwt\JwtHttpBearerAuth;
-class FscProducttypeL1Controller extends \yii\rest\Controller
+class FscProducttypeL2Controller extends \yii\rest\Controller
 {
     public function behaviors()
     {
@@ -31,7 +32,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
     public function actionCreate()
     {
-		if(!Yii::$app->userrole->hasRights(array('add_fsc_product_description')))
+		if(!Yii::$app->userrole->hasRights(array('add_fsc_product_l2_description')))
 		{
 			return false;
 		}
@@ -40,8 +41,8 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 		$responsedata=array('status'=>0,'message'=>'Failed');
 		if ($data) 
 		{
-			$model = new FscProducttypeL1();
-			$model->fsc_product_id=$data['product_id'];
+			$model = new FscProducttypeL2();
+			$model->fsc_product_type_l1_id=$data['product_id'];
 			$model->name=$data['name'];
 			$model->code=$data['code'];
 			//$model->code='';
@@ -62,7 +63,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
     public function actionIndex()
     {
-		if(!Yii::$app->userrole->hasRights(array('fsc_product_l1_description_master')))
+		if(!Yii::$app->userrole->hasRights(array('fsc_product_l2_description_master')))
 		{
 			return false;
 		}
@@ -71,8 +72,8 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
         //return ['data'=>$model];
 		$post = yii::$app->request->post();
 		$date_format = Yii::$app->globalfuns->getSettings('date_format');
-		$model = FscProducttypeL1::find()->where(['<>','t.status',2])->alias('t');
-		$model->joinWith(['fscproduct as prd']);
+		$model = FscProducttypeL2::find()->where(['<>','t.status',2])->alias('t');
+		$model->joinWith(['fscproducttypeone as prd']);
 		
 		$model = $model->groupBy(['t.id']);
 		if(is_array($post) && count($post)>0 && isset($post['page']) && isset($post['pageSize']))
@@ -121,7 +122,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 			{
 				$data=array();
 				$data['id']=$producttype->id;
-				$data['product']=$producttype->fscproduct->name;
+				$data['product']=$producttype->fscproducttypeone->name;
 				$data['name']=$producttype->name;
 				$data['code']=$producttype->code;
 				$data['status']=$producttype->status;
@@ -265,7 +266,7 @@ class FscProducttypeL1Controller extends \yii\rest\Controller
 
 	public function actionGetProduct()
 	{
-		$Product = FscProducttypeL1::find()->select(['id','name'])->where(['status'=>0])->asArray()->all();
+		$Product = FscProducttypeL2::find()->select(['id','name'])->where(['status'=>0])->asArray()->all();
 		return ['products'=>$Product];
 	}
 }

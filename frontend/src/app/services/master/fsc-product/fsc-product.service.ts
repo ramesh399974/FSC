@@ -3,6 +3,7 @@ import { environment } from '@environments/environment';
 import { HttpClient, HttpHeaders,HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import {Product} from '@app/models/master/product';
+import { FscProductType } from '@app/models/master/FscProductType';
 
 @Injectable({
   providedIn: 'root'
@@ -31,4 +32,25 @@ export class FscProductService {
   getProductList(): Observable<Product[]>{
     return this.http.get<Product[]>(`${environment.apiUrl}/master/fsc-product/get-product`);
   }  
+
+  getFscProductTypes(id): Observable<FscProductType[]>{
+    
+    let params = new HttpParams();
+    params = params.append('id', id);
+    return this.http.get<FscProductType[]>(`${environment.apiUrl}/master/fsc-product/fsc-producttype`,{params:params});
+  }
+
+  getFscProductTypesOne(id): Observable<FscProductType[]>{
+    
+    let params = new HttpParams();
+    params = params.append('id', id);
+    return this.http.get<FscProductType[]>(`${environment.apiUrl}/master/fsc-product/fsc-producttype-one`,{params:params});
+  }
+
+  getFscProductTypesTwo(id): Observable<FscProductType[]>{
+    
+    let params = new HttpParams();
+    params = params.append('id', id);
+    return this.http.get<FscProductType[]>(`${environment.apiUrl}/master/fsc-product/fsc-producttype-two`,{params:params});
+  }
 }

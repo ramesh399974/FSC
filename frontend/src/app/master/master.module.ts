@@ -196,6 +196,11 @@ import { ViewFscProducttypeL3Component } from './fsc-producttype-l3/view-fsc-pro
 import { EditFscProductComponent } from './fsc-product/edit-fsc-product/edit-fsc-product.component';
 import { AddFscProductComponent } from './fsc-product/add-fsc-product/add-fsc-product.component';
 
+import { AddFscSubStandardComponent } from './fsc-sub-standard/add-fsc-sub-standard/add-fsc-sub-standard.component';
+import { EditFscSubStandardComponent } from './fsc-sub-standard/edit-fsc-sub-standard/edit-fsc-sub-standard.component';
+import { ListFscSubStandardComponent } from './fsc-sub-standard/list-fsc-sub-standard/list-fsc-sub-standard.component';
+import { ViewFscSubStandardComponent } from './fsc-sub-standard/view-fsc-sub-standard/view-fsc-sub-standard.component';
+
 
 @NgModule({
 
@@ -208,6 +213,10 @@ import { AddFscProductComponent } from './fsc-product/add-fsc-product/add-fsc-pr
     // AddSubDescriptionComponent,
     // ListSubDescriptionComponent,
     // EditSubDescriptionComponent,
+    AddFscSubStandardComponent,
+    EditFscSubStandardComponent,
+    ListFscSubStandardComponent,
+    ViewFscSubStandardComponent,
     AddComponent,
     EditComponent,
     ListComponent,

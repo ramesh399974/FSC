@@ -56,11 +56,14 @@
 						<li *ngIf="checkRole('material_master')"><a [routerLink]="['/master/materialcomposition/list']"><i class="fa fa-circle-o"></i> Material</a></li>
 						<li *ngIf="checkRole('fsc_product_master')"><a [routerLink]="['/master/fsc-product/list']"><i class="fa fa-circle-o"></i> FSC Product</a></li>
 						<li *ngIf="checkRole('fsc_product_l1_description_master')"><a [routerLink]="['/master/fsc-producttype-l1/list']"><i class="fa fa-circle-o"></i> FSC Product L-1 Description</a></li>
+						<li *ngIf="checkRole('fsc_product_l2_description_master')"><a [routerLink]="['/master/fsc-producttype-l2/list']"><i class="fa fa-circle-o"></i> FSC Product L-2 Description</a></li>
+						<li *ngIf="checkRole('fsc_product_l3_description_master')"><a [routerLink]="['/master/fsc-producttype-l3/list']"><i class="fa fa-circle-o"></i> FSC Product L-3 Description</a></li>
 																	
 						<li *ngIf="checkRole('process_master')" ><a [routerLink]="['/master/process/list']"><i class="fa fa-circle-o"></i> Process</a></li>
 						<!-- <li *ngIf="checkRole('process_master')" ><a [routerLink]="['/master/list-audit-standard']"><i class="fa fa-circle-o"></i> Audit Standard</a></li> -->
 						<li *ngIf="checkRole('standard_master')"><a [routerLink]="['/master/standard/list']"><i class="fa fa-circle-o"></i> Standard</a></li>
 						<li *ngIf="checkRole('standard_master')"><a [routerLink]="['/master/fsc-standard/list-fsc']"><i class="fa fa-circle-o"></i> FSC Standard</a></li>
+						<li *ngIf="checkRole('standard_master')"><a [routerLink]="['/master/fsc-sub-standard/list']"><i class="fa fa-circle-o"></i> FSC Sub Standard</a></li>
 						<li *ngIf="checkRole('reduction_standard_master')"><a [routerLink]="['/master/reductionstandard/list']"><i class="fa fa-circle-o"></i> Reduction Standard</a></li>
 						<li *ngIf="checkRole('standard_reduction_master')"><a [routerLink]="['/master/standardreduction/list']"><i class="fa fa-circle-o"></i> Standard Reduction</a></li>
 						<li *ngIf="checkRole('standard_combination_master')"><a [routerLink]="['/master/standard-combination/index']"><i class="fa fa-circle-o"></i> Standard Combination</a></li>

@@ -1,29 +1,34 @@
 import {DecimalPipe} from '@angular/common';
-import {Directive, Component, QueryList, ViewChildren } from '@angular/core';
+import {Directive, Component, QueryList, ViewChildren, OnInit } from '@angular/core';
 import {Observable} from 'rxjs';
-import { FscProducttypeL3ListService } from '@app/services/master/fsc-producttype-l3/fsc-producttype-l3-list.service';
+import { FscSubStandard } from '@app/models/master/FscSubStandard';
+
+import {FscSubStandardListService} from '@app/services/master/fscsubstanard/fscsubstandard-list.service';
 import {NgbdSortableHeader, SortEvent,PaginationList,commontxt} from '@app/helpers/sortable.directive';
+
+
 import { first } from 'rxjs/operators';
-import { FscProductType } from '@app/models/master/FscProductType';
 import {NgbModal, ModalDismissReasons, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
 import { ErrorSummaryService } from '@app/helpers/errorsummary.service';
 import { AuthenticationService } from '@app/services/authentication.service';
 
-@Component({
-  selector: 'app-list-fsc-producttype-l3',
-  templateUrl: './list-fsc-producttype-l3.component.html',
-  styleUrls: ['./list-fsc-producttype-l3.component.scss'],
-  providers:[FscProducttypeL3ListService]
-})
-export class ListFscProducttypeL3Component  {
 
-  producttypes$: Observable<FscProductType[]>;
+@Component({
+  selector: 'app-list-fsc-sub-standard',
+  templateUrl: './list-fsc-sub-standard.component.html',
+  styleUrls: ['./list-fsc-sub-standard.component.scss'],
+  providers : [FscSubStandardListService]
+})
+export class ListFscSubStandardComponent {
+
+  
+  standards$: Observable<FscSubStandard[]>;
   total$: Observable<number>;
   //sno:number;
   paginationList = PaginationList;
   commontxt = commontxt;
-  
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
+
 
   closeResult: string;
   modalOptions:NgbModalOptions;
@@ -45,12 +50,13 @@ export class ListFscProducttypeL3Component  {
   userdetails:any;
   userdecoded:any;
 
-  constructor(public fscproducttypethreeservice: FscProducttypeL3ListService,private modalService: NgbModal,private errorSummary: ErrorSummaryService, private authservice:AuthenticationService) {
-    this.producttypes$ = fscproducttypethreeservice.producttypes2$;
-    this.total$ = fscproducttypethreeservice.total$;
+
+  constructor(public service: FscSubStandardListService,private modalService: NgbModal,private errorSummary: ErrorSummaryService, private authservice:AuthenticationService) {
+    this.standards$ = service.standards$;
+    this.total$ = service.total$;
     
-    this.modalOptions = this.errorSummary.modalOptions;
-    
+    this.modalOptions = this.errorSummary.modalOptions;	
+
     this.authservice.currentUser.subscribe(x => {
       if(x){
         
@@ -63,7 +69,6 @@ export class ListFscProducttypeL3Component  {
         this.userdecoded=null;
       }
     });
-    
   }
 
   onSort({column, direction}: SortEvent) {
@@ -75,8 +80,8 @@ export class ListFscProducttypeL3Component  {
       }
     });
 
-    this.fscproducttypethreeservice.sortColumn = column;
-    this.fscproducttypethreeservice.sortDirection = direction;
+    this.service.sortColumn = column;
+    this.service.sortDirection = direction;
   }
 
   open(content,action,id) {
@@ -131,7 +136,7 @@ export class ListFscProducttypeL3Component  {
     commonUpdateData(actionStatus) {
       
     this.alertInfoMessage='Please wait. Your request is processing';
-    this.fscproducttypethreeservice.commonActionData({id:this.model.id,status:actionStatus}).pipe(first())
+    this.service.commonActionData({id:this.model.id,status:actionStatus}).pipe(first())
       .subscribe(res => {
       this.model.id = null;
       this.model.action = null;
@@ -142,7 +147,7 @@ export class ListFscProducttypeL3Component  {
         this.alertInfoMessage='';
               this.alertSuccessMessage = res.message;
         setTimeout(()=>this.modalss.close('deactivate'),this.errorSummary.redirectTime);
-        this.fscproducttypethreeservice.searchTerm=this.fscproducttypethreeservice.searchTerm;
+        this.service.searchTerm=this.service.searchTerm;
           }else if(res.status == 0){			
         this.alertInfoMessage='';
               this.alertErrorMessage = res.message;	
@@ -166,5 +171,6 @@ export class ListFscProducttypeL3Component  {
     this.cancelBtn=true;
     this.okBtn=true;
     }
+
 
 }

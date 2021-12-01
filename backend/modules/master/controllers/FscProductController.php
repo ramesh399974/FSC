@@ -2,6 +2,9 @@
 namespace app\modules\master\controllers;
 
 use app\modules\master\models\FscProduct;
+use app\modules\master\models\FscProducttypeL1;
+use app\modules\master\models\FscProducttypeL2;
+use app\modules\master\models\FscProducttypeL3;
 
 use Yii;
 
@@ -113,6 +116,48 @@ class FscProductController extends \yii\rest\Controller
 		$Product = FscProduct::find()->select(['id','name'])->where(['status'=>0])->asArray()->all();
 		return ['products'=>$Product];
 	}
+
+	public function actionFscProducttype($id)
+    {
+        $ProductType = FscProducttypeL1::find()->where(['status'=>0,'fsc_product_id'=>$id])->all();                
+        $currentTotal = count($ProductType);
+        if($currentTotal > 0 )
+        {
+            return array('status' => true, 'data'=> $ProductType);
+        }
+        else
+        {
+            return array('status'=>false,'data'=> array());
+        }
+    }
+
+	public function actionFscProducttypeOne($id)
+    {
+        $ProductType = FscProducttypeL2::find()->where(['status'=>0,'fsc_product_type_l1_id'=>$id])->all();                
+        $currentTotal = count($ProductType);
+        if($currentTotal > 0 )
+        {
+            return array('status' => true, 'data'=> $ProductType);
+        }
+        else
+        {
+            return array('status'=>false,'data'=> array());
+        }
+    }
+
+	public function actionFscProducttypeTwo($id)
+    {
+        $ProductType = FscProducttypeL3::find()->where(['status'=>0,'fsc_product_type_l2_id'=>$id])->all();                
+        $currentTotal = count($ProductType);
+        if($currentTotal > 0 )
+        {
+            return array('status' => true, 'data'=> $ProductType);
+        }
+        else
+        {
+            return array('status'=>false,'data'=> array());
+        }
+    }
 
     public function actionCreate()
 	{
