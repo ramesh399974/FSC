@@ -1615,7 +1615,7 @@ class UserDashboard extends Model
 		$resultarr=array();
 		$appmodel = User::find()->where(['t.status'=> '0'])->alias('t');
 		$appmodel = $appmodel->innerJoinWith(['userstandard as standard']);
-		$appmodel = $appmodel->andWhere('DATEDIFF(standard.witness_valid_until,NOW()) <=90 AND standard.witness_valid_until IS NOT NULL AND standard.witness_valid_until!=\'0000-00-00\'');
+		$appmodel = $appmodel->andWhere('DATEDIFF(standard.witness_valid_until,NOW()) <=90 AND standard.witness_valid_until IS NOT NULL ');
 		/*if($this->is_headquarters!=1)
 		{
 			$appmodel = $appmodel->andWhere('franchise_id="'.$franchiseid.'"');
@@ -1803,7 +1803,9 @@ class UserDashboard extends Model
 						$brdnamemod = $abg->applicationbrands;
 						if(count($brdnamemod)>0){
 							foreach($brdnamemod as $brn){
-								$brnamearr[]=isset($brn->brands->name)?$brn->brands->name:'';
+								if(isset($brn->brands->name)){
+									$brnamearr[]=$brn->brands->name;
+								} 
 							}
 
 						}
@@ -1981,7 +1983,7 @@ class UserDashboard extends Model
 
 		$appmodel = Audit::find()->select('*,t.id as id,DATEDIFF(NOW(),`auditp`.`audit_completed_date` ) as due_days')->where(['t.status'=>$arrStatuslist])->alias('t');
 		$appmodel = $appmodel->innerJoinWith(['auditplan as auditp']);		
-		$appmodel = $appmodel->andWhere('DATEDIFF(NOW(),auditp.audit_completed_date) >=0  AND auditp.audit_completed_date IS NOT NULL AND auditp.audit_completed_date!=\'0000-00-00\'');
+		$appmodel = $appmodel->andWhere('DATEDIFF(NOW(),auditp.audit_completed_date) >=0  AND auditp.audit_completed_date IS NOT NULL ');
 		
 		$appmodel = $appmodel->orderBy(['due_days' => SORT_DESC]);
 
@@ -2093,9 +2095,9 @@ class UserDashboard extends Model
 					$appmodel = Certificate::find()->select('t.parent_app_id,DATEDIFF(t.certificate_valid_until,NOW()) as due_days,t.certificate_valid_until as certificate_valid_until')->where(['t.status'=>array($modelCertificate->arrEnumStatus['certificate_generated'],$modelCertificate->arrEnumStatus['extension'],$modelCertificate->arrEnumStatus['expired'],$modelCertificate->arrEnumStatus['cancellation'])])->alias('t');
 					$appmodel = $appmodel->innerJoinWith(['application as app']);		
 					if($fromDays==0){
-						$appmodel = $appmodel->andWhere('DATEDIFF(t.certificate_valid_until,NOW()) <='.$toDays.' AND t.certificate_valid_until IS NOT NULL AND t.certificate_valid_until!=\'0000-00-00\'');
+						$appmodel = $appmodel->andWhere('DATEDIFF(t.certificate_valid_until,NOW()) <='.$toDays.' AND t.certificate_valid_until IS NOT NULL ');
 					}else{
-						$appmodel = $appmodel->andWhere('DATEDIFF(t.certificate_valid_until,NOW()) >='.$fromDays.' AND DATEDIFF(t.certificate_valid_until,NOW()) <='.$toDays.' AND t.certificate_valid_until IS NOT NULL AND t.certificate_valid_until!=\'0000-00-00\'');
+						$appmodel = $appmodel->andWhere('DATEDIFF(t.certificate_valid_until,NOW()) >='.$fromDays.' AND DATEDIFF(t.certificate_valid_until,NOW()) <='.$toDays.' AND t.certificate_valid_until IS NOT NULL ');
 					}
 					
 					$appmodel = $appmodel->orderBy(['due_days' => SORT_ASC]);
@@ -2197,9 +2199,9 @@ class UserDashboard extends Model
 					$appmodel = $appmodel->innerJoinWith(['auditplan as auditp','certificate as cert']);
 					
 					if($fromDays==0){
-						$appmodel = $appmodel->andWhere('DATEDIFF(cert.certificate_valid_until,NOW()) <='.$toDays.' AND cert.certificate_valid_until IS NOT NULL AND cert.certificate_valid_until!=\'0000-00-00\'');
+						$appmodel = $appmodel->andWhere('DATEDIFF(cert.certificate_valid_until,NOW()) <='.$toDays.' AND cert.certificate_valid_until IS NOT NULL ');
 					}else{
-						$appmodel = $appmodel->andWhere('DATEDIFF(cert.certificate_valid_until,NOW()) >='.$fromDays.' AND DATEDIFF(cert.certificate_valid_until,NOW()) <='.$toDays.' AND cert.certificate_valid_until IS NOT NULL AND cert.certificate_valid_until!=\'0000-00-00\'');
+						$appmodel = $appmodel->andWhere('DATEDIFF(cert.certificate_valid_until,NOW()) >='.$fromDays.' AND DATEDIFF(cert.certificate_valid_until,NOW()) <='.$toDays.' AND cert.certificate_valid_until IS NOT NULL ');
 					}
 					$appmodel = $appmodel->andWhere(' cert.certificate_status=0');
 					//$appmodel = $appmodel->andWhere('DATEDIFF(cert.certificate_valid_until,NOW()) >='.$fromDays.' AND DATEDIFF(cert.certificate_valid_until,NOW()) <='.$toDays.' AND cert.certificate_valid_until IS NOT NULL AND cert.certificate_valid_until!=\'0000-00-00\'');
