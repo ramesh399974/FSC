@@ -81,5 +81,11 @@
     brandids?:any;
     created_by?:any;
     audit_type_label?:any;
+    reprensentive?:any
+    official_email?:any; 
+    official_website?:any; 
+    tradeBrandNames?:any;
+    sub_std_name?:any;
+    sub_std_chk_name?:any;
 
 }

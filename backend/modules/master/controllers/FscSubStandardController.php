@@ -138,10 +138,10 @@ class FscSubStandardController extends \yii\rest\Controller
 			{
 				$model = $model->orderBy([$post['sortColumn']=>$sortDirection]);
 			}
-			else
-			{
-				$model = $model->orderBy(['priority' => SORT_ASC]);
-			}
+			// else
+			// {
+			// 	$model = $model->orderBy(['priority' => SORT_ASC]);
+			// }
 			
 
 
@@ -205,6 +205,7 @@ class FscSubStandardController extends \yii\rest\Controller
 
             $model = FscSubStandard::find()->where(['id' => $data['id']])->one();
             $model->name=$data['name'];
+			$model->fsc_standard_id=$data['sub_standard_type'];
             $model->code=$data['code'];
 			$model->short_code=$data['short_code'];
 			$model->version=$data['version'];

@@ -12,6 +12,7 @@ use app\modules\master\models\User;
 use app\modules\offer\models\Offer;
 use app\modules\certificate\models\Certificate;
 
+
 use app\models\EnquiryStandard;
 use app\models\Enquiry;
 
@@ -198,6 +199,8 @@ class Application extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ApplicationStandard::className(), ['app_id' => 'id'])->andOnCondition(['standard_status' => array(0,8,5)]);
 	}
+
+	
 	
 	public function getApplicationstandardview()
     {
@@ -338,7 +341,12 @@ class Application extends \yii\db\ActiveRecord
 	public function getManday()
     {
         return $this->hasMany(ApplicationUnitManday::className(), ['app_id' => 'id']);
-    }	
+    }
+	
+	public function getapplicationtrade()
+    {
+        return $this->hasMany(ApplicationTradeBrandDetails::className(), ['app_id' => 'id']);
+    }
 	
 	public function cloneApplicationProduct($data)
 	{
@@ -1101,6 +1109,48 @@ class Application extends \yii\db\ActiveRecord
 			$company_name=$this->applicationaddress->company_name;		
 		}
 		return $company_name;
+	}
+
+	public function getOfficialemail()
+	{
+		$official_email = '';
+		//$obj = $this->hasOne(ApplicationChangeAddress::className(), ['id' => 'address_id']);
+		//if($obj !== null){
+			//$company_name = $obj->company_name;
+		//}
+		if($this->applicationaddress!==null)
+		{
+			$official_email=$this->applicationaddress->official_email;		
+		}
+		return $official_email;
+	}
+
+	public function getOfficialwebsite()
+	{
+		$official_website = '';
+		//$obj = $this->hasOne(ApplicationChangeAddress::className(), ['id' => 'address_id']);
+		//if($obj !== null){
+			//$company_name = $obj->company_name;
+		//}
+		if($this->applicationaddress!==null)
+		{
+			$official_website=$this->applicationaddress->official_website;		
+		}
+		return $official_website;
+	}
+
+	public function getRepresentative()
+	{
+		$representative = '';
+		//$obj = $this->hasOne(ApplicationChangeAddress::className(), ['id' => 'address_id']);
+		//if($obj !== null){
+			//$company_name = $obj->company_name;
+		//}
+		if($this->applicationaddress!==null)
+		{
+			$representative=$this->applicationaddress->representative;		
+		}
+		return $representative;
 	}
 	
 	public function getContactname()

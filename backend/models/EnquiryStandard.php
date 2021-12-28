@@ -45,6 +45,6 @@ class EnquiryStandard extends \yii\db\ActiveRecord
 	
 	public function getStandard()
     {
-        return $this->hasOne(Standard::className(), ['id' => 'standard_id']);
+        return $this->hasOne(FscStandard::className(), ['id' => 'fsc_standard_id']);
     }
 }

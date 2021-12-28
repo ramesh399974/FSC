@@ -63,9 +63,22 @@
 							<th width="20%">Tax/GST File</th>
 							<td width="30%"><a *ngIf="applicationdata.company_file" href="javascript:void(0);" (click)="downloadCompanyFile(applicationdata.company_file);open(downloading,'',appform);" ><i class="fa fa-download" ></i>&nbsp;{{ applicationdata.company_file }}</a></td>
 						</tr>
-						<tr *ngIf="applicationdata.tax_no">
-							<th width="20%">Tax no./NTN No./GST No./VAT No</th>
-							<td colspan="3">{{ applicationdata.tax_no }}</td>
+						<tr >
+							<th *ngIf="applicationdata.tax_no"width="20%">Tax no./NTN No./GST No./VAT No</th>
+							<td *ngIf="applicationdata.tax_no" width="30%">{{ applicationdata.tax_no }}</td>
+							<th width="20%">Legal Representative</th>
+							<td width="30%">{{ applicationdata.reprensentive }}</td>
+						</tr>
+						<tr >
+							<th width="20%">Official Email</th>
+							<td width="30%">{{ applicationdata.official_email }}</td>
+							<th width="20%">Official Website</th>
+							<td width="30%">{{ applicationdata.official_website }}</td>
+						</tr>
+						<tr >
+							<th width="20%">Trade/Brand Name</th>
+							<td width="30%">{{ applicationdata.tradeBrandNames }}</td>
+							
 						</tr>
 					</table>
 					
@@ -143,6 +156,25 @@
 						</tr>
 					</table>	
 
+					<h3>Sub Standard Information</h3>
+					<table class="table-secondary m-b-15">
+						<tr>
+							<th width="20%">Standard</th>
+							<td width="80%"> {{ applicationdata.sub_std_name }}
+								
+							</td>
+						</tr>
+					</table>	
+					<h3>Sub Standard Description</h3>
+					<table class="table-secondary m-b-15">
+						<tr>
+							<th width="20%">Category</th>
+							<td width="80%">{{ applicationdata.sub_std_chk_name }}
+								
+							</td>
+						</tr>
+					</table>	
+
 					<div class="m-b-5" *ngIf="applicationdata.applicationcertifiedbyothercb && applicationdata.applicationcertifiedbyothercb.length>0">
 						<h3>Already Certified Details</h3>
 						<table class="table table-bordered col-12">
@@ -193,26 +225,23 @@
 							<th scope="col" class="center">S.No</th>
 							<th scope="col"  >Product Category</th>
 							<th scope="col"  >Type of Product</th>
-							<th scope="col" class="center" >Wastage (%)</th>
+							<th scope="col"  >Type of Product L-2</th>
+							<th scope="col"  >Type of Product L-3</th>
+							<!-- <th scope="col" class="center" >Wastage (%)</th>
 							<th scope="col" >Material Composition</th>
 							<th scope="col"  >Standard</th>
-							<th scope="col"  >Label Grade</th>
+							<th scope="col"  >Label Grade</th> -->
 						</tr>
 						</thead>
 						<tbody>
-							<ng-container *ngFor="let product of applicationdata.productDetails; index as i">
+							<ng-container *ngFor="let product of applicationdata.products; index as i">
 								<tr>
 									<td scope="row" class="center"   >{{  1+ i }}</td>
 									<td >{{ product.name }}</td>
 									<td >{{ product.product_type_name }}</td>
-									<td class="center">{{ product.wastage }}</td>
-									<td >
-										{{ product.materialcompositionname }}
-									</td>
-									<td>{{ product.standard_name }}</td>
-									<td>{{ product.label_grade_name }}</td>
+									<td >{{ product.product_type_two_name }}</td>
+									<td >{{ product.product_type_three_name }}</td>	
 								</tr> 
-								
 							</ng-container>               
 						</tbody>
 					</table>					
@@ -263,10 +292,12 @@
 									<th scope="col" class="center">S.No</th>
 									<th scope="col"  >Product Category</th>
 									<th scope="col"  >Type of Product</th>
-									<th scope="col" class="center" >Wastage (%)</th>
+									<th scope="col"  >Type of Product L-2</th>
+									<th scope="col"  >Type of Product L-3</th>
+									<!-- <th scope="col" class="center" >Wastage (%)</th>
 									<th scope="col" >Material Composition</th>
 									<th scope="col"  >Standard</th>
-									<th scope="col"  >Label Grade</th>
+									<th scope="col"  >Label Grade</th> -->
 								</tr>
 								</thead>
 								<tbody>
@@ -275,12 +306,8 @@
 											<td scope="row" class="center"   >{{  1+ is }}</td>
 											<td >{{ product.name }}</td>
 											<td >{{ product.product_type_name }}</td>
-											<td class="center">{{ product.wastage }}</td>
-											<td >
-												{{ product.materialcompositionname }}
-											</td>
-											<td>{{ product.standard_name }}</td>
-											<td>{{ product.label_grade_name }}</td>
+											<td >{{ product.product_type_two_name }}</td>
+											<td >{{ product.product_type_three_name }}</td>
 										</tr> 
 											  
 								</tbody>

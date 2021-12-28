@@ -356,7 +356,7 @@ class FscStandardController extends \yii\rest\Controller
 
 	public function actionGetFscStandard()
 	{
-		$stds = FscStandard::find()->select(['id','name','code'])->where(['status'=>0])->asArray()->all();
+		$stds = FscStandard::find()->select(['id','name','code','description'])->where(['status'=>0])->asArray()->all();
 		return ['standards'=>$stds];
 	}
 }

@@ -78,6 +78,10 @@ export class AddComponent implements OnInit {
   fscproductTypeList: any;
   fscproductList: any;
   fscproductstandard_error: string;
+  tradeEntries: any=[];
+  fscsubStandardList: any;
+  sub_std_desc_title: any;
+  tradeErrors: string;
   constructor(public brandService: BrandService,public fscstandards: FscStandardService,private reductionstandard:ReductionStandardService,private modalService: NgbModal,private BusinessSectorService: BusinessSectorService, private router:Router,private processService:ProcessService, private fb:FormBuilder,
     private productService:ProductService,private countryservice: CountryService,
     private fscproductservice : FscProductService,
@@ -193,7 +197,7 @@ export class AddComponent implements OnInit {
 
   modalss:any;
   guidanceContent='';
-  openguidance(content,type) {
+  openguidance(content,type,data='') {
 
     if(type=='scopeholder')
     {
@@ -234,6 +238,18 @@ export class AddComponent implements OnInit {
     else if(type=='process_grid')
     {
       this.guidanceContent='Process Grid';
+    }
+    else if(type=='trade_field')
+    {
+      this.guidanceContent='Trade/Brand Name Field';
+    }
+    else if(type=='trade_grid')
+    {
+      this.guidanceContent='Trade/Brand Name Grid';
+    }
+    else if(type=='standard_info')
+    {
+      this.guidanceContent=data;
     }
     else
     {
@@ -417,6 +433,8 @@ export class AddComponent implements OnInit {
 
     this.fscstandards.getFscSubStandard().pipe(first()).subscribe(res => {
       this.fscSubStandardList = res['standards'];
+      this.fscsubStandardList = this.fscSubStandardList.filter(std=>std.id!=1 && std.id!=2)
+
     });
 
     this.fscproductservice.getProductList().subscribe(res => {
@@ -455,7 +473,7 @@ export class AddComponent implements OnInit {
 					this.standardAdditionList = resadd['standardaddition'];	
 			  
 
-					this.standards.getStandard().pipe(first()).subscribe(ress => {
+					this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
 						//this.standardList = ress['standards']; 
 						
             this.standardList = ress['standards'].filter(stdx=>this.standardAdditionList.includes(stdx.id));
@@ -466,7 +484,7 @@ export class AddComponent implements OnInit {
                 this.ocb.push(this.fb.group({
                   validity_date: [''],
                   certification_body: [''],
-                  certificationfile: ['']
+                  
                 }));
               });
             }
@@ -481,7 +499,7 @@ export class AddComponent implements OnInit {
 					});
 				});				
 			}else{
-        this.standards.getStandard().pipe(first()).subscribe(ress => {
+        this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
           this.standardList = ress['standards']; 
         
           
@@ -679,6 +697,7 @@ export class AddComponent implements OnInit {
       sel_brand_ch:(res.sel_brand_ch)?res.sel_brand_ch:"2",
       sel_brand : (res.sel_brand)?res.sel_brand:'',
       sel_cons_ch:(res.sel_cons_ch)?res.sel_cons_ch:"2",
+      sel_cb_ch:(res.sel_cb_ch)?res.sel_cb_ch:"2",
       sel_cons : (res.sel_cons)?res.sel_cons:'',
       consultant_name : res.consultant_name,
       consultant_company : res.consultant_company,
@@ -692,7 +711,7 @@ export class AddComponent implements OnInit {
 			preferred_partner_id:res.preferred_partner_id,
 			
       });
-      
+      this.selFscStandardList=res.standard_details;
       this.appdataloading = false;
 		},
     error => {
@@ -707,7 +726,7 @@ export class AddComponent implements OnInit {
     });
 
      
-    this.standards.getStandard().pipe(first()).subscribe(res => {
+    this.fscstandards.getFscStandard().pipe(first()).subscribe(res => {
       this.standardList = res['standards'];  
       this.selStandardList = this.standardList.filter(x=>this.selStandardIds.includes(x.id));
 
@@ -720,7 +739,7 @@ export class AddComponent implements OnInit {
             this.ocb.push(this.fb.group({
               validity_date: [''],
               certification_body: [''],
-              certificationfile: ['']
+             
             }));
           });
         }
@@ -764,10 +783,13 @@ export class AddComponent implements OnInit {
       company_address:['',[Validators.required]],      
 	    city :['',[Validators.required,this.errorSummary.noWhitespaceValidator,Validators.maxLength(255)]],
       zipcode:['',[Validators.required, this.errorSummary.noWhitespaceValidator,Validators.maxLength(15)]],	
-      tax_no:['',[this.errorSummary.noWhitespaceValidator,Validators.maxLength(35)]],		
-		
+      tax_no:['',[Validators.required,this.errorSummary.noWhitespaceValidator,Validators.maxLength(35)]],		
+      representative:['',[Validators.required,this.errorSummary.noWhitespaceValidator]],
+      official_email:['',[Validators.required, this.errorSummary.noWhitespaceValidator,Validators.email,Validators.maxLength(255)]],
+      website:['',[Validators.required,Validators.pattern("^(http[s]?:\\/\\/){0,1}(www\\.){0,1}[a-zA-Z0-9\\.\\-]+\\.[a-zA-Z]{2,5}[\\.]{0,1}$"),this.errorSummary.noWhitespaceValidator]],
       state_id:['',[Validators.required]],
       country_id:['',[Validators.required]],
+      trade_brand:['',[Validators.required,this.errorSummary.noWhitespaceValidator]],
       
       salutation:['',[Validators.required,this.errorSummary.noWhitespaceValidator]],
       title:[''],
@@ -796,7 +818,8 @@ export class AddComponent implements OnInit {
       certFile:[''],
       auditReportFile:[''],
       coc: this.fb.array(['1']),
-      fsc:[''],
+      sub_std_chk:[''],
+      sub_std:[''],
       singleCoc:[''],
       multipleCoc:[''],
       single_head:[''],
@@ -809,6 +832,7 @@ export class AddComponent implements OnInit {
       sel_cons_ch:['',[Validators.required]],
       consultant_name:[''],
       consultant_company:[''],
+      sel_cb_ch:['',[Validators.required]],
 
       sel_process:['',[Validators.required]],
       sel_brand : ['',[Validators.required]],
@@ -865,7 +889,6 @@ export class AddComponent implements OnInit {
       const consultant_company = this.enquiryForm.get('consultant_company');
       if (val === "1") {
         consultant_name.setValidators(Validators.required);
-        consultant_company.setValidators(Validators.required);
         this.enquiryForm.updateValueAndValidity();
       }else if (val === "2") {
         consultant_name.clearValidators();
@@ -894,7 +917,7 @@ export class AddComponent implements OnInit {
                 this.selStandardIds.push(""+val+"");
                 
               });
-              this.standards.getStandard().pipe(first()).subscribe(res => {
+              this.fscstandards.getFscStandard().pipe(first()).subscribe(res => {
                 this.standardList = res['standards'];  
                 this.selStandardList = this.standardList.filter(x=>this.selStandardIds.includes(x.id));    
                 this.getBsectorList('main');
@@ -915,6 +938,7 @@ export class AddComponent implements OnInit {
               country_id:res.company_country_id,
               sel_brand_ch:"2",
               sel_cons_ch:"2",
+              sel_cb_ch:"2",
               first_name:res.first_name,
               last_name:res.last_name,
               company_telephone:res.telephone,
@@ -923,6 +947,7 @@ export class AddComponent implements OnInit {
               consultant_company:res.consultant_company,
             });
           }
+          this.selFscStandardList=res.standard_details;
           this.appdataloading = false;
 
         },
@@ -1484,12 +1509,12 @@ addFscProductStandard(){
     this.f.productFsc_type_two.updateValueAndValidity();
     this.f.productFsc_type_three.updateValueAndValidity();
     
-    if(this.productFscStandardList.length<=0){
+    // if(this.productFscStandardList.length<=0){
 
-      this.f.fsc_composition_standard.setValidators([Validators.required]);
+    //   this.f.fsc_composition_standard.setValidators([Validators.required]);
      
-      this.f.fsc_composition_standard.updateValueAndValidity();
-    }
+    //   this.f.fsc_composition_standard.updateValueAndValidity();
+    // }
 
     this.touchProduct();
     let productId:number = this.enquiryForm.get('productFsc').value;
@@ -1513,11 +1538,11 @@ addFscProductStandard(){
     }
     this.unitproductErrors='';
 
-    if(productId <=0 || productId=== null  || product_type==''|| product_type_two=='' || product_type_three==''  || this.productFscStandardList.length<=0){
+    if(productId <=0 || productId=== null  || product_type==''|| product_type_two=='' || product_type_three==''){
      
-      if(this.productFscStandardList.length<=0){
-        this.productstandardgrade_error = 'Please add standard';
-      }
+      // if(this.productFscStandardList.length<=0){
+      //   this.productstandardgrade_error = 'Please add standard';
+      // }
      
 
       return false;
@@ -1562,7 +1587,7 @@ addFscProductStandard(){
       })
       */
       //this.productListDetails.push(prdexpobject);
-      expobject["productStandardList"] = this.productFscStandardList;
+      // expobject["productStandardList"] = this.productFscStandardList;
       expobject["addition_type"] = 1;
       //standard_addition_id
       this.productEntries.push(expobject);
@@ -1600,7 +1625,7 @@ addFscProductStandard(){
       })
       */
       
-      entry["productStandardList"] = this.productFscStandardList;
+      // entry["productStandardList"] = this.productFscStandardList;
       entry["addition_type"] = 1;
       let passentry = {...this.productEntries[this.productIndex]};
       this.productEntries[this.productIndex] = entry;
@@ -1654,26 +1679,27 @@ addFscProductStandard(){
         let prdexpobject = {...entry};
 
         
-        selproduct.productStandardList.forEach(selstandard=>{
-          debugger
-          prdexpobject["standard_id"] = selstandard.standard_id;
-          prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
+        // selproduct.productStandardList.forEach(selstandard=>{
+        //   debugger
+        //   prdexpobject["standard_id"] = selstandard.standard_id;
+        //   prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
          
-          prdexpobject["pdt_index"] = pdt_index;
-          prdexpobject["productIndex"] = productIndex;
+        //   prdexpobject["pdt_index"] = pdt_index;
+        //   prdexpobject["productIndex"] = productIndex;
           
-          let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
+        //   let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
           
-          if(stdindex !== -1){
-            this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-          }
+        //   if(stdindex !== -1){
+        //     this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
+        //   }
           
            
-          this.productListDetails.push({...prdexpobject});
-          pdt_index++;
-        })
-
-      
+        //   this.productListDetails.push({...prdexpobject});
+        //   pdt_index++;
+        // })
+        
+        prdexpobject["pdt_index"] = pdt_index;
+        this.productListDetails.push({...prdexpobject});
     }else{
       debugger;
       //let pdt_index = this.productListDetails.length; 
@@ -1881,7 +1907,7 @@ addFscProductStandard(){
     
     
    
-    this.productFscStandardList = [...prd.productStandardList];//[{standard_id:prd.standard_id,standard_name:prd.standard_name,label_grade:prd.label_grade,label_grade_name:prd.label_grade_name}];
+    // this.productFscStandardList = [...prd.productStandardList];//[{standard_id:prd.standard_id,standard_name:prd.standard_name,label_grade:prd.label_grade,label_grade_name:prd.label_grade_name}];
    
     this.showProduct = true;
     
@@ -1939,6 +1965,11 @@ addFscProductStandard(){
     if(index !== -1)
       this.processEntries.splice(index,1);
   }
+  removeTrade(index :number)
+  {
+    if(index!==-1)
+     this.tradeEntries.splice(index,1);
+  }
   addProcess(){
     let processId = this.enquiryForm.get('sel_process').value;
     let selprocess = this.processList.find(s => s.id ==  processId);
@@ -1975,6 +2006,26 @@ addFscProductStandard(){
     this.enquiryForm.patchValue({
       sel_process: '',
     });
+  }
+  addTrade()
+  {
+    this.f.trade_brand.markAsTouched()
+
+    let trade_brand_name = this.enquiryForm.get('trade_brand').value;
+    if(trade_brand_name=='' || trade_brand_name===undefined || trade_brand_name===null)
+    {
+      this.enquiryForm.controls.trade_brand.setErrors({'required': true})
+    }else{
+      this.tradeEntries.push(trade_brand_name)
+      this.enquiryForm.patchValue({
+        trade_brand :''
+      })
+      this.enquiryForm.controls.trade_brand.setValidators(null)
+      this.enquiryForm.controls.trade_brand.updateValueAndValidity();
+
+      console.log(this.tradeEntries)
+    }
+   
   }
   editProcess(processId:number){
     let prd= this.processEntries.find(s => s.id ==  processId);
@@ -2224,16 +2275,17 @@ addFscProductStandard(){
   filterProduct(){
     debugger
     if(this.currentunittype==1){
-      let appstandards = [...this.selCocStandardIds];//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
+      let appstandards = [...this.selStandardIds];//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
       if(appstandards.length>0){
-        return this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        // this.productListDetails= this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        return this.productListDetails;
       }else{
         return [];
       }
     }else{
       let appstandards = [...this.selUnitStandardList];//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
       if(appstandards.length>0){
-        return this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        return this.productListDetails;
       }else{
         return [];
       }
@@ -2514,6 +2566,7 @@ addFscProductStandard(){
       this.emptyUnits();
       this.unitIndex = null;
       this.showCert = false;
+      console.log(this.unitEntries)
   }
   
   standardwiseBSector:any = [];
@@ -2869,12 +2922,7 @@ addFscProductStandard(){
     }
     // console.log(this.selStandardIds)
     this.standardsLength = this.enquiryForm.get('fscChk').value.length;
-    if(id ==1 ) {
-      this.cocCheck = !this.cocCheck;
-    }
-    if(id == 2 ) {
-      this.projectCertification = !this.projectCertification;
-    }
+   
   }
 
   singleHeadChk:boolean= false;
@@ -2892,28 +2940,30 @@ addFscProductStandard(){
   selCocStandardIds : Array<any> =[];
  cockey =[];
   onCocChange(id, value:boolean) {
-    const cocFormArray = <FormArray>this.enquiryForm.get('coc');
-    let fscStandardDetails = this.fscSubStandardList.find(x => x.id == id);
+    // const cocStd = this.enquiryForm.get('sub_std');
+    // let fscStandardDetails = this.fscSubStandardList.find(x => x.id == id);
     // this.enquiryForm.patchValue({tradeName:'',labelFsc_grade:''});
-    if (value) {
-      cocFormArray.push(new FormControl(id));
-      this.selCocStandardList.push({id:fscStandardDetails.id,name:fscStandardDetails.name,fsc_standard_id : fscStandardDetails.fsc_standard_id});
-      this.selCocStandardIds.push(id);
-    } else {
-      let index = cocFormArray.controls.findIndex(x => x.value == id);
-      cocFormArray.removeAt(index);
-      this.selCocStandardList = this.selCocStandardList.filter(x => x.id != id);
-      this.selCocStandardIds = this.selCocStandardIds.filter(y => y != id);
-    }
-    this.cockey= this.selCocStandardList.map(prodType => prodType.id);
+    // if (value) {
+    //   cocFormArray.push(new FormControl(id));
+    //   this.selCocStandardList.push({id:fscStandardDetails.id,name:fscStandardDetails.name,fsc_standard_id : fscStandardDetails.fsc_standard_id});
+    //   this.selCocStandardIds.push(id);
+    // } else {
+    //   let index = cocFormArray.controls.findIndex(x => x.value == id);
+    //   cocFormArray.removeAt(index);
+    //   this.selCocStandardList = this.selCocStandardList.filter(x => x.id != id);
+    //   this.selCocStandardIds = this.selCocStandardIds.filter(y => y != id);
+    // }
+    // this.cockey= this.selCocStandardList.map(prodType => prodType.id);
     // this.standardsLength = this.enquiryForm.get('fscChk').value.length;
     this.cocError = ''
     if(id ==3 && value == true) {
       this.cocSubCheck = true;
-    } else if(id==3 && value == false){
+      let substddetails = this.fscsubStandardList.find(x=>x.id==id);
+      this.sub_std_desc_title=substddetails.name;
+    } else if((id==3 && value == false) || id!=3){
       this.cocSubCheck = false;
     }
-    console.log(this.selCocStandardList);
+    // console.log(this.selCocStandardList);
   }
 
 
@@ -3216,7 +3266,7 @@ addFscProductStandard(){
 
   onUnitStandardChange(id: number, isChecked: boolean) {
     
-    let standardDetails = this.selCocStandardList.find(x => x.id == id);
+    let standardDetails = this.selFscStandardList.find(x => x.id == id);
     
     const standardsFormArray = <FormArray>this.enquiryForm.get('unitstandardsChk');
     if (isChecked) {
@@ -3318,14 +3368,14 @@ addFscProductStandard(){
 		});
 	  });*/
 
-    this.productEntries.forEach((selproduct)=>{
-      selproduct.productStandardList.forEach(selstandard=>{
+    // this.productEntries.forEach((selproduct)=>{
+    //   selproduct.productStandardList.forEach(selstandard=>{
       
-        if(selectedProductStd.includes(parseInt(""+selstandard.standard_id)) === false){
-          selectedProductStd.push(parseInt(""+selstandard.standard_id)); 
-        }
-      });
-    });
+    //     if(selectedProductStd.includes(parseInt(""+selstandard.standard_id)) === false){
+    //       selectedProductStd.push(parseInt(""+selstandard.standard_id)); 
+    //     }
+    //   });
+    // });
 
   
 	  let selectedPrdStdLength = selectedProductStd.length;
@@ -3348,10 +3398,12 @@ addFscProductStandard(){
   }
 
   showCertFn(){
-    if(!this.validateProductWithStandard())
-    {
-      return false;
-    }
+    // if(!this.validateProductWithStandard())
+    // {
+    //   return false;
+    // }
+
+
 	
     this.unitIndex = null;
     this.unitListError='';
@@ -3434,7 +3486,7 @@ addFscProductStandard(){
         {			
           let validity_date = this.ocb.at(index).value.validity_date;
           let certification_body = this.ocb.at(index).value.certification_body;
-          let document = this.certifiedbyothercbfiles[x.id];
+          // let document = this.certifiedbyothercbfiles[x.id];
           
           this.ocb.at(index).get("validity_date").setValidators([]);
           this.ocb.at(index).get("validity_date").updateValueAndValidity();
@@ -3443,9 +3495,9 @@ addFscProductStandard(){
           this.ocb.at(index).get("certification_body").setValidators([]);
           this.ocb.at(index).get("certification_body").updateValueAndValidity();
           this.ocb.at(index).get("certification_body").markAsTouched();
-          this.certifiedbyothercbFileError[x.id] = '';
+          // this.certifiedbyothercbFileError[x.id] = '';
 
-          if((validity_date!='' && validity_date!==null) || (certification_body!='' && certification_body!==null) || (this.certifiedbyothercbfiles[x.id] && this.certifiedbyothercbfiles[x.id] !=''  && this.certifiedbyothercbfiles[x.id] !==undefined))
+          if((validity_date!='' && validity_date!==null) || (certification_body!='' && certification_body!==null) )
           {
             this.ocb.at(index).get("validity_date").setValidators([Validators.required]);
             this.ocb.at(index).get("validity_date").updateValueAndValidity();
@@ -3455,11 +3507,11 @@ addFscProductStandard(){
             this.ocb.at(index).get("certification_body").updateValueAndValidity();
             this.ocb.at(index).get("certification_body").markAsTouched();
 
-            if(!this.certifiedbyothercbfiles[x.id] || this.certifiedbyothercbfiles[x.id] =='' || this.certifiedbyothercbfiles[x.id] === undefined)
-            {
-              this.certifiedbyothercbFileError[x.id] = 'Please upload file';
-              formerrors = true;
-            }
+            // if(!this.certifiedbyothercbfiles[x.id] || this.certifiedbyothercbfiles[x.id] =='' || this.certifiedbyothercbfiles[x.id] === undefined)
+            // {
+            //   this.certifiedbyothercbFileError[x.id] = 'Please upload file';
+            //   formerrors = true;
+            // }
             if(validity_date=='' || validity_date===null){
               formerrors = true;
             }
@@ -3494,66 +3546,33 @@ addFscProductStandard(){
   fscProductlistError= false;
   onSubmit(actiontype){
     console.log(this.enquiryForm.value)
-  	if(!this.validateProductWithStandard())
-  	{
-  		this.error = {summary:this.std_with_product_std_error};
-  		return false;
-  	}
+  	// if(!this.validateProductWithStandard())
+  	// {
+  	// 	this.error = {summary:this.std_with_product_std_error};
+  	// 	return false;
+  	// }
+    debugger
     if(this.selFscStandardList.length >=1) {
-      if(this.cocCheck) {
-        if(this.enquiryForm.value.coc.includes('3')) {
-          if(this.cocSubCheck) {
-            if(this.enquiryForm.value.fsc == "") { 
-              this.error = {summary:this.errorSummary.errorSummaryText};
-              this.fscError = "Please select FSC";
-              return false;
-            }
-          } else {
-            this.enquiryForm.controls['fsc'].setValue("") ;          }
-        } 
+      // if(this.cocCheck) {
+      //   if(this.enquiryForm.value.coc.includes('3')) {
+      //     if(this.cocSubCheck) {
+      //       if(this.enquiryForm.value.fsc == "") { 
+      //         this.error = {summary:this.errorSummary.errorSummaryText};
+      //         this.fscError = "Please select FSC";
+      //         return false;
+      //       }
+      //     } else {
+      //       this.enquiryForm.controls['fsc'].setValue("") ;          }
+      //   } 
         
-      } else {
+      // } else {
        
-        this.enquiryForm.controls['fsc'].setValue("") ;
+      //   this.enquiryForm.controls['fsc'].setValue("") ;
         
-      }
-
-      if(this.projectCertification) {
-        if(this.enquiryForm.value.multiple_head == '') {
-          this.error = {summary:this.errorSummary.errorSummaryText};
-          this.projectCertError = "Please select any one option";
-          return false;
-        }
-        if(this.enquiryForm.value.project_certification == "") {
-          this.error = {summary:this.errorSummary.errorSummaryText};
-          this.projectCertificationError = "Please select Project Certification";
-          return false;
-        }
-
-        if (this.projectSubCertification) {
-          if(this.enquiryForm.value.multiple_head == 'single' && this.enquiryForm.value.single_project.includes('2') && this.enquiryForm.value.singleCoc == "") {
-            this.error = {summary:this.errorSummary.errorSummaryText};
-            this.singleFscError = "Please select coc option";
-            return false;
-          }
-          if(this.enquiryForm.value.multiple_head == 'multiple' && this.enquiryForm.value.multiple_project.includes('2') && this.enquiryForm.value.multipleCoc == "") {
-            
-            this.error = {summary:this.errorSummary.errorSummaryText};
-            this.multipleFscError = "Please select coc option";
-            return false;
-
-          }
+      // }
 
 
-
-          
-        } 
-        
-      } else {
-        this.enquiryForm.controls['project_certification'].setValue("") ;
-      }
-
-      if(this.productFscEntries.length < 1) {
+      if(this.productEntries.length < 1) {
         this.std_with_product_std_error = "Please Add Product(s)"
         this.fscProductlistError = true;
         this.error = {summary:this.std_with_product_std_error};
@@ -3586,24 +3605,30 @@ addFscProductStandard(){
       this.f.unit_name.updateValueAndValidity();
       this.touchUnit();
     }
-    this.f.product.setValidators([]);
-    this.f.wastage.setValidators([]);
-    this.f.product_type.setValidators([]);
-    this.f.composition_standard.setValidators([]);
-    this.f.label_grade.setValidators([]);
-    this.f.material.setValidators([]);
-    this.f.material_type.setValidators([]);
-    this.f.material_percentage.setValidators([]);
+    this.f.productFsc.setValidators([]);
+    this.f.productFsc_type.setValidators([]);
+    this.f.productFsc_type_two.setValidators([]);
+    this.f.productFsc_type_three.setValidators([]);
+    // this.f.wastage.setValidators([]);
+    // this.f.product_type.setValidators([]);
+    // this.f.composition_standard.setValidators([]);
+    // this.f.label_grade.setValidators([]);
+    // this.f.material.setValidators([]);
+    // this.f.material_type.setValidators([]);
+    // this.f.material_percentage.setValidators([]);
     this.f.sel_process.setValidators([]);
 
-    this.f.product.updateValueAndValidity();
-    this.f.wastage.updateValueAndValidity();
-    this.f.product_type.updateValueAndValidity();
-    this.f.composition_standard.updateValueAndValidity();
-    this.f.label_grade.updateValueAndValidity();
-    this.f.material.updateValueAndValidity();
-    this.f.material_type.updateValueAndValidity();
-    this.f.material_percentage.updateValueAndValidity();
+    this.f.productFsc.updateValueAndValidity();
+    this.f.productFsc_type.updateValueAndValidity();
+    this.f.productFsc_type_two.updateValueAndValidity();
+    this.f.productFsc_type_three.updateValueAndValidity();
+    // this.f.wastageFsc_.updateValueAndValidity();
+    // this.f.product_type.updateValueAndValidity();
+    // this.f.composition_standard.updateValueAndValidity();
+    // this.f.label_grade.updateValueAndValidity();
+    // this.f.material.updateValueAndValidity();
+    // this.f.material_type.updateValueAndValidity();
+    // this.f.material_percentage.updateValueAndValidity();
     this.f.sel_process.updateValueAndValidity();
 
     this.errorSummary.validateAllFormFields(this.enquiryForm);
@@ -3625,6 +3650,9 @@ addFscProductStandard(){
     let state_id = this.f.state_id.value;
     let city = this.f.city.value;
     let tax_no = this.f.tax_no.value;
+    let legal_rep = this.f.representative.value;
+    let official_email = this.f.official_email.value;
+    let official_website = this.f.website.value;
     let company_file = this.company_file;
     let salutation = this.f.salutation.value;
     let first_name = this.f.first_name.value;
@@ -3634,16 +3662,22 @@ addFscProductStandard(){
     let company_email = this.f.company_email.value;
     let sel_brand_ch = this.f.sel_brand_ch.value;
     let sel_brand = (this.f.sel_brand_ch.value==1)?this.f.sel_brand.value:'';
-
+    let sub_std = this.f.sub_std.value;
+    let fsc = this.f.sub_std_chk.value;
     let sel_cons_ch = this.f.sel_cons_ch.value;
-    
+    let sub_std_desc = this.cocSubStandard.find(x=>x.id==fsc).name;
     // let sel_cons = (this.f.sel_cons_ch.value==1)?this.f.sel_cons.value:'';
 
     let consultant_name = this.f.consultant_name.value;
     let consultant_company = this.f.consultant_company.value;
     
     let formerrors=false;
-
+    this.tradeErrors = '';
+    if(this.tradeEntries.length<=0)
+    {
+      this.tradeErrors ='Please add Trade/Brand Name';
+       formerrors=true;
+    }
     if(sel_cons_ch === "1" && consultant_name === '' && consultant_company === ''  ){
       //console.log("validator");
       this.f.consultant_name.updateValueAndValidity();
@@ -3683,7 +3717,7 @@ addFscProductStandard(){
     });
 
     if(company_name =='' || company_address=='' || zipcode=='' || country_id=='' || country_id==null || state_id==null || state_id=='' || city =='' || salutation=='' || first_name=='' || last_name=='' || job_title=='' || company_telephone==''
-      || company_email=='' || sel_cons_ch=='' || sel_brand_ch=='')
+      || company_email=='' || sel_cons_ch=='' || sel_brand_ch=='' || legal_rep=='' || official_email=='' || official_website=='' || this.tradeEntries.length <=0 || sub_std =='' || sub_std===null || fsc=='' || fsc===null)
     {
       formerrors= true;
     }
@@ -3751,15 +3785,24 @@ addFscProductStandard(){
     
     let productdatas = [];
 
-    
+    console.log(this.productEntries)
     this.productEntries.forEach((val)=>{
-      let productStandardList = [];
-      val.productStandardList.forEach((listval)=>{
-        productStandardList.push({standard_id:listval.standard_id,standard_name:listval.standard_name,label_grade:listval.label_grade,label_grade_name:listval.label_grade_name});
+      // let productStandardList = [];
+      // val.productStandardList.forEach((listval)=>{
+      //   productStandardList.push({standard_id:listval.standard_id,standard_name:listval.standard_name,label_grade:listval.label_grade,label_grade_name:listval.label_grade_name});
+      // });
+      
+      
+      productdatas.push({
+        addition_type:val.addition_type,
+        product_id:val.id,name:val.name,
+        product_type:val.product_type_id,
+        product_type_name:val.product_type_name,
+        product_type_two_id : val.product_type_two_id,
+        product_type_two_name:val.product_type_two_name,
+        product_type_three_id:val.product_type_three_id,
+        product_type_three_name : val.product_type_three_name
       });
-      
-      
-      productdatas.push({addition_type:val.addition_type,product_id:val.id,name:val.name,wastage:val.wastage,product_type:val.product_type_id,productStandardList:productStandardList});
     });
     
     
@@ -3996,8 +4039,8 @@ addFscProductStandard(){
           validity_date = this.errorSummary.displayDateFormat(this.ocb.at(index).value.validity_date);
         }				
 				let certification_body = this.ocb.at(index).value.certification_body;
-				let documentdata = this.certifiedbyothercbfiles[x.id]?this.certifiedbyothercbfiles[x.id]:'';
-				certifiedothercblist.push({validity_date:validity_date,certification_body:certification_body,standard_id:x.id,document:documentdata});
+				// let documentdata = this.certifiedbyothercbfiles[x.id]?this.certifiedbyothercbfiles[x.id]:'';
+				certifiedothercblist.push({validity_date:validity_date,certification_body:certification_body,standard_id:x.id});
 			}
 		});
 	}	
@@ -4006,7 +4049,7 @@ addFscProductStandard(){
     formvalue.product_fsc = [];
     formvalue.products = [];
     formvalue.units = [];
-    formvalue.product_fsc = this.productFscEntries;
+    formvalue.tradelist = this.tradeEntries;
     formvalue.products = productdatas;
     formvalue.units = unitDataEntries;
     formvalue.standards = standards;
@@ -4024,6 +4067,7 @@ addFscProductStandard(){
     formvalue.app_audit_type = this.app_audit_type;
     formvalue.sel_cons_ch = formvalue.sel_cons_ch;
     formvalue.sel_cons = (formvalue.sel_cons_ch==1)?formvalue.sel_cons:'';
+    formvalue.sub_std_desc_name = fsc?sub_std_desc:'';
 
     // formvalue.consultant_name = (formvalue.consultant_name==undefined)?formvalue.consultant_name:'--';
     // formvalue.consultant_company = (formvalue.consultant_company==undefined)?formvalue.consultant_company:'--';
@@ -4204,10 +4248,10 @@ addFscProductStandard(){
 
   }
   
-  filterProductStandard(stdId){
-    
+  filterProductStandard(){
+    debugger
     const unitProductIndex = this.unitProductList.map(x=>x.pdt_index).map(String);
-    return this.productListDetails.filter(x =>  stdId==x.standard_id && !unitProductIndex.includes(""+x.pdt_index+"")  );
+    return this.productListDetails.filter(x =>  !unitProductIndex.includes(""+x.pdt_index+"")  );
     /*
     if(this.currentunittype==1){
      
@@ -4239,9 +4283,9 @@ addFscProductStandard(){
       })
     }
 
-    if(this.currentunittype==1)
+    if(this.currentunittype==1 || this.currentunittype==0)
     {		
-      this.selProductStandardList=[...this.selCocStandardIds];
+      this.selProductStandardList=[...this.selStandardIds];
       //this.selProductStandardList=this.selUnitStandardList;
     }else{
       //this.selProductStandardList=this.selStandardIds;
@@ -4249,7 +4293,8 @@ addFscProductStandard(){
     }
     
     this.unitproductremainingstatus=true;
-    if(this.filterProduct().length==this.unitProductList.length)
+    let filterProductLen = this.filterProduct().length;
+    if(filterProductLen==this.unitProductList.length)
     {
       this.unitproductremainingstatus=false;
     }

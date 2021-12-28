@@ -25,7 +25,7 @@
 
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label for="company_name">Company Name <span class="text-danger">*</span></label>
+                                    <label for="company_name">Legal Company Name <span class="text-danger">*</span></label>
                                     
                                     <input type="text" (change)="fillUnit()" formControlName="company_name" [class.is-invalid]="f.company_name.invalid && f.company_name.touched " class="form-control" placeholder="Company Name" >
                                     <div *ngIf="f.company_name.errors" class="invalid-feedback">
@@ -116,7 +116,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label>Tax/GST File</label><br>
+                                    <label>Legal Tax/GST File</label><br>
                                     <input type="file" formControlname="company_file" (change)="companyfileChange($event)" style="width:184px"  >
                                     <br><div style="font-size:11px;" >supported file formats: <span *ngFor="let docs of this.errorSummary.validDocs; let last=last;">{{ docs}}<span *ngIf="!last">, </span> </span></div>
                                     <div *ngIf="company_file" style="padding:5px; border:1px solid #cecece; background-color: beige; height:32px;width: 50%;">
@@ -128,16 +128,87 @@
                                     </div>
                                 </div>
                                 <div class="col-4">
-                                    <label>Tax No./NTN No./GST No./VAT No.</label>
+                                    <label>Legal Tax No./NTN No./GST No./VAT No.</label>
                                     <input type="text" class="form-control" formControlName="tax_no" [class.is-invalid]="f.tax_no.invalid && f.tax_no.touched" class="form-control" placeholder="Tax No./NTN No./GST No./VAT No." >
                                     <div *ngIf="f.tax_no.errors" class="invalid-feedback">
-                                        <div *ngIf="f.tax_no.errors.maxlength">Tax No./NTN No./GST No./VAT No. cannot exceed 35 characters</div>
-                                        <div *ngIf="f.tax_no.hasError('whitespace')">Invalid Tax No./NTN No./GST No./VAT No.</div>      
+										<div *ngIf="f.tax_no.errors.required">Legal Tax cannot be blank.</div>
+                                        <div *ngIf="f.tax_no.errors.maxlength">Legal Tax No./NTN No./GST No./VAT No. cannot exceed 35 characters</div>
+                                        <div *ngIf="f.tax_no.hasError('whitespace')">Invalid Legal Tax No./NTN No./GST No./VAT No.</div>      
+                                    </div>
+                                </div>
+								<div class="col-4">
+                                    <label>Legal Representative<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" formControlName="representative" [class.is-invalid]="f.representative.invalid && f.representative.touched" class="form-control" placeholder="Legal Representative" >
+                                    <div *ngIf="f.representative.errors" class="invalid-feedback">
+										<div *ngIf="f.representative.errors.required">Legal Representative cannot be blank.</div>
+                                        <div *ngIf="f.representative.errors.maxlength">Legal Representative cannot exceed 255 characters</div>
+                                        <div *ngIf="f.representative.hasError('whitespace')">Invalid Legal Representative</div>      
                                     </div>
                                 </div>
                             </div>
+							<div class="form-group row">
+								<div class="col-4">
+									<label>Official Email ID<span class="text-danger">*</span></label>
+									<input type="text" formControlName="official_email" [class.is-invalid]="f.official_email.invalid && f.official_email.touched " class="form-control" placeholder="Official Email" >
+									<div *ngIf="f.official_email.errors" class="invalid-feedback">
+										<div *ngIf="f.official_email.errors.required" >Official Email is required</div>
+										<div *ngIf="f.official_email.errors.maxlength">Official Email cannot exceed 255 characters</div>
+										<div *ngIf="f.official_email.errors.email">Official Email must be a valid email address</div>
+										<div *ngIf="f.official_email.hasError('whitespace')">Invalid Official Email</div>
+									</div>                                
+								</div>
+								<div class="col-4">
+									<label>Official Website<span class="text-danger">*</span></label>
+									<input type="text" formControlName="website" placeholder="Website" class="form-control" [class.is-invalid]="f.website.invalid && f.website.touched">
+									<div *ngIf="f.website.errors" class="invalid-feedback">
+									  <div *ngIf="f.website.errors.required" >Website is required</div>
+									  <div *ngIf="f.website.errors.pattern || f.website.hasError('whitespace')">Invalid Official Website Address</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group row">
+								
+									<div class="col-6 pad-left">
+										<label>Trade Name/Brand Name List</label><a href="javascript:void(0);" (click)="openguidance(showguidance,'trade_grid')"  ><i class="fa fa-info-circle" aria-hidden="true" style="margin-left: 5px;"></i></a>
+										<table id="datatable" class="table table-bordered tab-bor col-12" >
+											<thead>
+											<tr>
+												<th scope="col" class="center">S.No</th>
+												<th scope="col">Trade Name/Brand Name</th>
+												<th scope="col" class="center">Action</th>
+											</tr>
+											</thead>
+											<tbody>
+												<tr *ngIf="tradeEntries?.length==0">
+													<td colspan="3" class="center">No Trade Name Added</td>
+												</tr>
+												<tr *ngFor="let tradeEntry of tradeEntries; let i=index; ">
+													<td scope="row" class="center">{{  1+ i }}</td>
+													<td>{{ tradeEntry}}</td>
+													<td  class="center">
+														<a href="javascript:void(0);" (click)="removeTrade(i)"> <i class="fa fa-trash text-danger"></i> </a>
+														<!--*ngIf="!standard_addition_id || (standard_addition_id && processEntry.addition_type)"-->
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div class="col-4">
+										<label>Trade Name/Brand Name <span class="text-danger">*</span></label><a href="javascript:void(0);" (click)="openguidance(showguidance,'trade_field')"  ><i class="fa fa-info-circle" aria-hidden="true" style="margin-left: 5px;"></i></a>
+										<input type="text" class="form-control" formControlName="trade_brand" [class.is-invalid]="f.trade_brand.invalid && f.trade_brand.touched" class="form-control" placeholder="Trade/Brand Name" >
+                                    <div *ngIf="f.trade_brand.errors" class="invalid-feedback">
+										<div *ngIf="f.trade_brand.errors.required">Trade/Brand Name cannot be blank.</div>
+                                        <div *ngIf="f.trade_brand.errors.maxlength">Trade/Brand Name cannot exceed 255 characters</div>
+                                        <div *ngIf="f.trade_brand.hasError('whitespace')">Invalid Trade/Brand Name</div>      
+                                    </div>
+									</div>
+								
+									<div class="col-2 pad-right" style="padding-top:30px;">
+										<a class="btn btn-success btn-sm" href="javascript:void(0);" role="button"  (click)="addTrade()"  >+Add</a>
+									</div>
+									<div  *ngIf="tradeErrors" class="col-8 validationerror">{{tradeErrors}}</div>
+								</div>
 
-                            
                             <h3 style="margin-top:30px">Main Contact Person</h3>
                             <div class="form-group row">
                                 <div class="col-4">
@@ -296,7 +367,7 @@
 								</div>
 								</div>
 								<div class="col-4">
-								<label>Consultancy Company <span class="text-danger">*</span></label>
+								<label>Consultancy Company </label>
 								 <input type="text" formControlName="consultant_company" [class.is-invalid]="f.consultant_company.invalid && f.consultant_company.touched " class="form-control" placeholder="Consultant Company" >
 								<div *ngIf="f.consultant_company.errors" class="invalid-feedback">
 								<div *ngIf="f.consultant_company.errors.required" >Consultant Company is required</div>
@@ -322,7 +393,7 @@
 									<div *ngFor="let standard of fscstandardList; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
 										<div class="checkbox" style="margin-bottom: 5px;">
 											<input id="lineCheckbox{{standard.id}}" [checked]="this.standardsChkDb.includes(standard.id)?true:false"  (change)="onFscChange(standard.id, $event.target.checked)" type="checkbox" [value]="standard.id" >
-											<label for="lineCheckbox{{ standard.id }}" >{{ standard.name }}</label>
+											<label for="lineCheckbox{{ standard.id }}" >{{ standard.name }}</label><a href="javascript:void(0);" (click)="openguidance(showguidance,'standard_info',standard.description)"  ><i class="fa fa-info-circle" aria-hidden="true" style="margin-left: 5px;"></i></a> <p *ngIf="standard.id==1" style="margin-left: 150px; margin-top: -40px;" >{{fscSubStandardList[0].name}} </p><p style="margin-left:150px" *ngIf="standard.id==1"> {{fscSubStandardList[1].name}}</p>
 										</div>
 									</div>
 								</div>  
@@ -331,11 +402,11 @@
 								</div>  
 								<h3 *ngIf="selStandardIds.length>0">FSC COC <span class="text-danger">*</span></h3>
 							<div  *ngIf="selStandardIds.length>0" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
-								<div class="row"  formArrayName="coc">
-				                     <div *ngFor="let cocstd of fscSubStandardList; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
-										<div  class="checkbox"   style="margin-bottom: 5px;">
-											<input type="checkbox" [class.disabled-content-checkbox]="(i=='0')?true:false"  [id]="cocstd.name"  (change)="onCocChange(cocstd.id, $event.target.checked)" [checked]="this.cockey.includes(cocstd.id)?true:false" [value]='cocstd.name'  >
-											<label [for]="cocstd.name" [class.disabled-content-checkbox]="(i=='0')?true:false" >{{ cocstd.name }} </label>
+								<div class="row" >
+				                     <div *ngFor="let cocstd of fscsubStandardList; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
+										<div  class="radio"   style="margin-bottom: 5px;">
+											<input type="radio"  formControlName="sub_std" [id]="cocstd.name"  (change)="onCocChange(cocstd.id, $event.target.checked)" [checked]="(f.sub_std.value==cocstd.id)?true:false" [value]='cocstd.id'  >
+											<label [for]="cocstd.name"  >{{ cocstd.name }} </label>
 										</div>
 									</div>
 								</div>  
@@ -343,12 +414,12 @@
                                 {{ cocError }}
 								</div>  
 							</div>
-							<h3 *ngIf="cocSubCheck && selStandardIds.includes('1')">FSC-STD-40-003 V2-1  <span class="text-danger">*</span></h3>
+							<h3 *ngIf="cocSubCheck && selStandardIds.includes('1')">{{sub_std_desc_title}}  <span class="text-danger">*</span></h3>
 							<div *ngIf="cocSubCheck && selStandardIds.includes('1')" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx">
 								<div class="row" >
 				                     <div *ngFor="let cocSubStd of cocSubStandard; let i =index" class="col-lg-4 col-md-6 col-sm-12 col-xs-12" >
 										<div  class="radio"  style="margin-bottom: 5px;">
-											<input type="radio" [id]="cocSubStd.name" (change)="errorfscChange('fsc')" [checked]="(f.fsc.value==cocSubStd.name)?true:false" formControlName="fsc" [value]='cocSubStd.name'  >
+											<input type="radio" [id]="cocSubStd.name" (change)="errorfscChange('fsc')" [checked]="(f.sub_std_chk.value==cocSubStd.id)?true:false" formControlName="sub_std_chk" [value]='cocSubStd.id'  >
 											<label [for]="cocSubStd.name">{{ cocSubStd.name }}</label>
 										</div>
 									</div>
@@ -447,6 +518,11 @@
 						
 						<div class="cs-pgm bg-white" *ngIf="ceritifedByOtherCertificationBodyFormStatus && selStandardIds && selStandardIds.length>0">
 							<h3>If you are already certified by other Certification Body for following standards <span class="text-danger">*</span><a href="javascript:void(0);" (click)="openguidance(showguidance,'standards')"  ><i class="fa fa-info-circle" aria-hidden="true" style="margin-left: 5px;"></i></a></h3>
+							<span class="name-pad" style="padding-top:15px;">
+								<input type="radio" id="cbyes" [checked]="f.sel_cb_ch.value=='1'?true:false" formControlName="sel_cb_ch" value="1">&nbsp; <label for="cbyes">Yes</label>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="radio" id="cbnno" [checked]="f.sel_cb_ch.value=='2'?true:false" formControlName="sel_cb_ch" value="2">&nbsp;<label for="cbno"> No</label>
+							</span>
 							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3 ch-bx pad-left pad-right">
 								<div class="col-12 pad-left pad-right">
 								<ng-container *ngFor="let othercertificationbody  of ocb.controls;  let ocbi = index">								   
@@ -454,27 +530,25 @@
 										<div *ngIf="selStandardIds.includes(fscstandardList[ocbi]?.id)">
 											<h3 style="font-size:14px;">{{fscstandardList[ocbi]?.name}}</h3>
 											<div class="form-group row m-t-10">
-												
 												<div class="col-4">
                                                     <label>Certification Body </label>
-                                                    
-                                                    <select formControlName="certification_body" (change)="fnValidateCertificationBody()" class="form-control select2" [class.is-invalid]="othercertificationbody.controls.certification_body.invalid && othercertificationbody.controls.certification_body.touched">
+                                                    <input type="text" formControlName="certification_body" [class.is-invalid]="othercertificationbody.controls.certification_body.invalid && othercertificationbody.controls.certification_body.touched " class="form-control"  placeholder="Certification Body" >
+													<div *ngIf="othercertificationbody.controls.certification_body.errors" class="invalid-feedback">
+													<div *ngIf="othercertificationbody.controls.certification_body.errors.required" >Certification Body is required</div>
+													<div *ngIf="othercertificationbody.controls.certification_body.errors.maxlength">Certification Body cannot exceed 255 characters</div>
+													<div *ngIf="othercertificationbody.controls.certification_body.errors.pattern || othercertificationbody.certification_body.hasError('whitespace')">Invalid Certification Body</div>
+													</div>
+												<!-- <select formControlName="certification_body" (change)="fnValidateCertificationBody()" class="form-control select2" [class.is-invalid]="othercertificationbody.controls.certification_body.invalid && othercertificationbody.controls.certification_body.touched">
                                                         <option value="" >-- Certification Body --</option>
                                                         <option *ngFor="let cb of cbList" value= {{cb.id}}>{{cb.name}}</option>
-                                                    </select>
-                                                    <!--
-                                                    <div *ngIf="aef.cb.errors" class="invalid-feedback">
-                                                        <div *ngIf="aef.cb.errors.required">CB cannot be blank.</div>
-                                                    </div>
-                                                    
-                                                    <input type="text" (change)="fnValidateCertificationBody()" formControlName="certification_body" class="form-control" placeholder="Certification Body" [class.is-invalid]="othercertificationbody.controls.certification_body.invalid && othercertificationbody.controls.certification_body.touched" >
-                                                    -->
-													<div *ngIf="othercertificationbody.controls.certification_body.errors" class="invalid-feedback">
+                                                    </select> -->
+                                                   
+													<!-- <div *ngIf="othercertificationbody.controls.certification_body.errors" class="invalid-feedback">
 														<div *ngIf="othercertificationbody.controls.certification_body.errors.required">Certification Body is required</div>
-													</div>
+													</div> -->
 												</div>	
 
-												<div class="col-4">
+												<div class="col-4" *ngIf="f.sel_cb_ch.value=='1'">
 													<label>Validity Date </label><br>
 													<!--
 													<input type="text" formControlName="validity_date" class="form-control"  [class.is-invalid]="othercertificationbody.controls.validity_date.invalid && othercertificationbody.controls.validity_date.touched" >
@@ -489,7 +563,7 @@
 													</div>
 												</div>
 												
-												<div class="col-4">
+												<!-- <div class="col-4">
 													<label>Certification File </label><br>
 													<input type="file" formControlname="certificationfile" (change)="certifiedbyothercbfileChange($event,fscstandardList[ocbi].id)" style="width:184px">
 													
@@ -502,7 +576,7 @@
                                                         {{ certifiedbyothercbFileError[fscstandardList[ocbi].id] }}
                                                     </div>
 													
-												</div>											
+												</div>											 -->
 											</div>
 										</div>	
 									</div>
@@ -521,7 +595,7 @@
 									<th scope="col"  >Product Description L-1 </th>
 									<th scope="col"  >Product Description L-2 </th>
 									<th scope="col" >Product Description L-3 </th>
-									<th scope="col">Standard(s)</th>
+									<!-- <th scope="col">Standard(s)</th> -->
 									<!-- <th scope="col">Label Grade</th> -->
 									<th scope="col" class="center" width="8%">Action</th>
 								</tr>
@@ -535,34 +609,34 @@
 									<!--<ng-container *ngFor="let productEntry of productListDetails; let i=index; "> -->
 										<tr [class.currentedit]="this.productIndex===i" >
 											
-											<td scope="row" [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length" >{{  1+i  }}</td>
-											<td [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length" >{{ productEntry.name }}</td>
+											<td scope="row"   >{{  1+i  }}</td>
+											<td   >{{ productEntry.name }}</td>
 											
-											<td [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length">{{ productEntry.product_type_name }}</td>
-											<td [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length" >{{ productEntry.product_type_two_name }}</td>
-											<td [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length" >{{ productEntry.product_type_three_name }}</td>
+											<td  >{{ productEntry.product_type_name }}</td>
+											<td   >{{ productEntry.product_type_two_name }}</td>
+											<td   >{{ productEntry.product_type_three_name }}</td>
 											<!-- <td  >11{{ productEntry.trade_name }}</td> -->
-											<td>
-												{{ productEntry.productStandardList.length>0?productEntry.productStandardList[0]['standard_name']:'' }}
+											<!-- <td>
+												{{ productEntry.productStandardList.length>0?productEntry.productStandardList[0]['standard_name']:'' }} -->
 												<!--{{ productEntry.standard_name }} -->
-											</td>
+											<!-- </td> -->
 											
-											<td   class="center" [attr.rowspan]="productEntry.productStandardList.length<=0?1:productEntry.productStandardList.length" >
+											<td   class="center"   >
 												<a *ngIf="!standard_addition_id || (standard_addition_id && productEntry.addition_type)" href="javascript:void(0);" (click)="editFscProduct(i)" title="Edit" alt="Edit"> <i class="fa fa-edit"></i> </a>
 												&nbsp;&nbsp;
 												<a *ngIf="!standard_addition_id || (standard_addition_id && productEntry.addition_type)" href="javascript:void(0);" (click)="removeFscProduct(i)" title="Delete" alt="Delete"> <i class="fa fa-trash text-danger"></i> </a>
 											</td>
 										</tr>
-										<ng-container *ngIf="productEntry.productStandardList.length>1">
+										<!-- <ng-container *ngIf="productEntry.productStandardList.length>1">
 											<tr  *ngFor="let productsEntry of productEntry.productStandardList | slice:1;" [class.currentedit]="this.productIndex===i"  >
-											   <td >{{ productsEntry.standard_name }}</td>
+											   <td >{{ productsEntry.standard_name }}</td> -->
 												<!-- <td  class="center">{{ productEntry.wastage }}</td>
 												<td >{{ productEntry.materialcompositionname }}</td>
 
 												<td>{{ productsEntry['standard_name'] }}</td>
 												<td>{{ productsEntry['label_grade_name'] }}</td> -->
-											</tr>
-										</ng-container>
+											<!-- </tr>
+										</ng-container> -->
 									</ng-container>
 								</tbody>
 							</table>
@@ -657,7 +731,7 @@
 									</div>	
 								
 							</div>
-										<div class="col-12 m-t-10 cs-pgm-blue">
+										<!-- <div class="col-12 m-t-10 cs-pgm-blue">
 									<div class="col-12 form-group row pad-left pad-right">									
 										<div class="col-5">
 											<label>FSC Product Standard <span class="text-danger">*</span></label>
@@ -687,8 +761,8 @@
 												<tr>
 													<th scope="col" class="center" width="3%">S.No</th>
 													<th scope="col"  >Product Standard Name</th>
-													<!-- <th scope="col" class="center" >Label Grade</th> -->
-													<th scope="col" class="center" width="8%">Action</th>
+													 <th scope="col" class="center" >Label Grade</th> -->
+													<!-- <th scope="col" class="center" width="8%">Action</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -697,9 +771,9 @@
 												</tr>
 												<tr *ngFor="let standardEntry of productFscStandardList; let i=index; "  >
 													<td scope="row" class="center">{{  1+ i }}</td>
-													<td>{{ standardEntry.standard_name }}</td>
+													<td>{{ standardEntry.standard_name }}</td> -->
 													<!-- <td class="center">{{ standardEntry.label_grade_name }}</td> -->
-													<td  class="center">
+													<!-- <td  class="center">
 														<a href="javascript:void(0);" (click)="removeFscProductStandard(standardEntry.standard_id)" title="Delete" alt="Delete"> <i class="fa fa-trash text-danger"></i> </a>
 													</td>
 												</tr>
@@ -707,7 +781,7 @@
 										</table>										
 										<div class="col-12 validationerror" *ngIf="fscproductstandardgrade_error" >{{ fscproductstandardgrade_error }}</div>
 									</div>									
-								</div>	
+								</div>	 --> 
 									
 									
 								
@@ -797,7 +871,7 @@
 								<div class="col-12 pad-left m-l-5">
 									<div class="row" formArrayName="unitstandardsChk" >
 										<ng-container *ngIf="this.currentunittype!=1">
-											<div *ngFor="let standard of selCocStandardList; let i =index" class="col-4" >
+											<div *ngFor="let standard of selFscStandardList; let i =index" class="col-4" >
 												<div class="checkbox">
 													<input [disabled]="(standard_addition_id && unitStandardsDisable[unit_autoid] && unitStandardsDisable[unit_autoid].includes(standard.id) ) ? true:false" id="inlineunitCheckbox{{standard.id}}" [checked]="this.selUnitStandardList.includes(standard.id)?true:false" (change)="onUnitStandardChange(standard.id, $event.target.checked);getBsectorList();" type="checkbox" [value]="standard.id">
 													<label for="inlineunitCheckbox{{ standard.id }}" >{{ standard.name }}</label>
@@ -807,7 +881,7 @@
 										<ng-container *ngIf="this.currentunittype==1">
 											<div class="card-box enq-view lst">
 													<ul style="margin-left:10px;">
-														<li *ngFor="let standard of selCocStandardList; ">
+														<li *ngFor="let standard of selFscStandardList; ">
 														<span>{{ standard.name }}</span></li>
 													</ul>
 											</div>
@@ -994,7 +1068,7 @@
 													<th scope="col"  >Product Description L-1</th>
 													<th scope="col"  >Product Description L-2</th>
 													<th scope="col"  >Product Description L-3</th>
-													<th scope="col"  >Standard</th>
+													<!-- <th scope="col"  >Standard</th> -->
 													<th scope="col" class="center" width="5%">Action</th>
 												</tr>
 											</thead>
@@ -1008,7 +1082,7 @@
 													<td>{{ productentry.product_type_name }}</td>
 													<td>{{ productentry.product_type_two_name }}</td>
 													<td>{{ productentry.product_type_three_name }}</td>
-													<td>{{ productentry.standard_name }}</td>
+													<!-- <td>{{ productentry.standard_name }}</td> -->
 													
 													<td  class="center">
 														<a *ngIf="!standard_addition_id || (standard_addition_id && productentry.addition_type)"  href="javascript:void(0);" (click)="removeUnitProduct(i)" > <i class="fa fa-trash text-danger"></i> </a>
@@ -1366,9 +1440,9 @@
 			<div class="clearfix"></div>
 			<div class="enq-view">
 				
-				<ng-container *ngFor="let std of selProductStandardList;  let i =index">
-					<ng-container *ngIf="filterProductStandard(std).length>0">
-					<h3>{{ getStandardName(std) }}</h3>
+				<ng-container >
+					<ng-container *ngIf="filterProductStandard().length>0">
+					<!-- <h3>{{ getStandardName(std) }}</h3> -->
 					<table class="table table-bordered col-12 pad-left pad-right" style="font-size:13px;">
 						<thead>
 							<tr>
@@ -1377,19 +1451,19 @@
 								<th scope="col" width="10%">Product Type L-1</th>	
 								<th scope="col" width="10%">Product Type L-2</th>
 								<th scope="col" width="10%">Product Type L-3</th>
-								<th scope="col" width="16%">Standard</th>																
+								<!-- <th scope="col" width="16%">Standard</th>																 -->
 								<th scope="col" width="3%" class="center">Select</th>																		
 							</tr>
 						</thead>
 						<tbody>
-							<ng-container *ngFor="let product of filterProductStandard(std);  let i =index" >
+							<ng-container *ngFor="let product of filterProductStandard();  let i =index" >
 								<tr>	
 									<td style="vertical-align:middle;" width="2%" scope="row" class="center">{{ 1+ i }}</td>
 									<td style="vertical-align:middle;">{{ product.name }}</td>
 									<td style="vertical-align:middle;">{{ product.product_type_name }}</td>
 									<td style="vertical-align:middle;">{{ product.product_type_two_name }}</td>
 									<td style="vertical-align:middle;">{{ product.product_type_three_name }}</td>
-									<td style="vertical-align:middle;">{{ product.standard_name }}</td>
+									<!-- <td style="vertical-align:middle;">{{ product.standard_name }}</td> -->
 																											
 									<td style="vertical-align:middle;" class="center" width="5%">
 										<!--{{product.pdt_index}}-->

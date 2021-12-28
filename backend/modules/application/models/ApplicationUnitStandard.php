@@ -3,7 +3,7 @@
 namespace app\modules\application\models;
 
 use Yii;
-use app\modules\master\models\Standard;
+use app\modules\master\models\FscStandard;
 use app\modules\master\models\StandardLicenseFee;
 
 /**
@@ -47,7 +47,7 @@ class ApplicationUnitStandard extends \yii\db\ActiveRecord
 	
 	public function getStandard()
     {
-        return $this->hasOne(Standard::className(), ['id' => 'standard_id']);
+        return $this->hasOne(FscStandard::className(), ['id' => 'standard_id']);
     }
 	
 	public function getStandardlicensefee()

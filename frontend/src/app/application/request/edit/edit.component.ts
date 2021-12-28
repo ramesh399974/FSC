@@ -79,6 +79,10 @@ export class EditComponent implements OnInit {
   fscproductTypeTwoList: any[];
   fscproductTypeList: any;
   fscproductstandard_error: string;
+  tradeEntries: any=[];
+  fscsubStandardList: any;
+  sub_std_desc_title: any;
+  tradeErrors: string;
 
   constructor(public brandService: BrandService,public fscstandards: FscStandardService,private reductionstandard:ReductionStandardService,private modalService: NgbModal,private router:Router,private BusinessSectorService: BusinessSectorService,private processService:ProcessService,private activatedRoute:ActivatedRoute, 
     private fb:FormBuilder,private productService:ProductService,
@@ -227,12 +231,13 @@ export class EditComponent implements OnInit {
 
     this.fscstandards.getFscSubStandard().pipe(first()).subscribe(res => {
       this.fscSubStandardList = res['standards'];
+      this.fscsubStandardList = this.fscSubStandardList.filter(std=>std.id!=1 && std.id!=2)
     })
 
     this.fscproductservice.getProductList().subscribe(res => {
       this.fscproductList = res['products'];      
     });
-
+  
     this.getBSectorStandardWise();
     this.enquiry.getEnquiryDetails(this.id).
     pipe(
@@ -252,7 +257,7 @@ export class EditComponent implements OnInit {
           //this.ceritifedByOtherCertificationBodyFormStatus = false;
     			this.standardAdditionService.getStandardAdditionList({app_id:this.app_id,standard_addition_id:this.standard_addition_id}).pipe(first()).subscribe(resadd => {
     			   this.standardAdditionList = resadd['standardaddition'];
-             this.standards.getStandard().pipe(first()).subscribe(ress => {
+             this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
              
               this.standardList = ress['standards'].filter(stdx=>this.standardAdditionList.includes(stdx.id));
               
@@ -268,13 +273,13 @@ export class EditComponent implements OnInit {
           
           
     		}else{
-          this.standards.getStandard().pipe(first()).subscribe(ress => {
+          this.fscstandards.getFscStandard().pipe(first()).subscribe(ress => {
               this.standardList = ress['standards']; 
           
             
               res.standard_ids.forEach(val=>{
                 this.standardsChkDb.push(""+val+"");
-                this.selStandardIds.push(""+val+"");
+                this.selStandardIds.push(""+val+"");       
               });
               this.selStandardList = this.standardList.filter(x=>this.selStandardIds.includes(x.id));
               this.setCertificationBody(res['applicationcertifiedbyothercb']);
@@ -301,7 +306,7 @@ export class EditComponent implements OnInit {
       
       this.applicationData = res;
       
-      this.productListDetails = res.productDetails;
+      this.productListDetails = res.products;
       this.productEntries = res.products;
        if(res && res.units)
       res.units.forEach((val)=>{
@@ -412,7 +417,7 @@ export class EditComponent implements OnInit {
 
         sel_cons_ch:(res.sel_cons_ch)?res.sel_cons_ch:"2",
         sel_cons : (res.sel_cons)?res.sel_cons:'',
-
+        sel_cb_ch:(res.sel_cb_ch)?res.sel_cb_ch:"2",
     
         title:res.title,
         first_name:res.first_name,
@@ -422,12 +427,24 @@ export class EditComponent implements OnInit {
         job_title:res.job_title,
         company_telephone:res.telephone,
         company_email:res.email_address,
+        official_email : res.official_email,
+        website : res.official_website,
+        representative:res.reprensentive?res.reprensentive:'',
         preferred_partner_id:res.preferred_partner_id,
+        sub_std:""+res.sub_std+"",
+        sub_std_chk:""+res.sub_std_chk+""
         
       });
-
+      this.selFscStandardList=res.standard_details;
+      this.tradeEntries = res.tradeEntries;
       this.brand_file=res.brand_file;
       this.appdataloading = false;
+      if(res.sub_std==3)
+      {
+        this.cocSubCheck=true;
+        let substddetails = this.fscsubStandardList.find(x=>x.id==3);
+        this.sub_std_desc_title=substddetails.name;
+      }
     },
     error => {
         this.error = {summary:error};
@@ -450,7 +467,7 @@ export class EditComponent implements OnInit {
     });
  
 
-	  this.standards.getStandard().pipe(first()).subscribe(res => {
+	  this.fscstandards.getFscStandard().pipe(first()).subscribe(res => {
       this.standardList = res['standards'];   
       
       
@@ -465,7 +482,7 @@ export class EditComponent implements OnInit {
         this.t.push(this.fb.group({
             answer: [x.answer, [Validators.required]],
             comment: [x.comment, [Validators.required]],
-            checklistfile: ['']
+           
         }));
         this.uchecklistfiles[x.id] = x.document;
       })
@@ -495,7 +512,11 @@ export class EditComponent implements OnInit {
       city:['',[Validators.required]],
       state_id:['',[Validators.required]],
       country_id:['',[Validators.required]],
-      tax_no:['',[this.errorSummary.noWhitespaceValidator,Validators.maxLength(35)]],	
+      tax_no:['',[Validators.required,this.errorSummary.noWhitespaceValidator,Validators.maxLength(35)]],	
+      representative:['',[Validators.required,this.errorSummary.noWhitespaceValidator]],
+      official_email:['',[Validators.required, this.errorSummary.noWhitespaceValidator,Validators.email,Validators.maxLength(255)]],
+      website:['',[Validators.required,Validators.pattern("^(http[s]?:\\/\\/){0,1}(www\\.){0,1}[a-zA-Z0-9\\.\\-]+\\.[a-zA-Z]{2,5}[\\.]{0,1}$"),this.errorSummary.noWhitespaceValidator]],
+      trade_brand:['',[Validators.required,this.errorSummary.noWhitespaceValidator]],
       salutation:['',[Validators.required]],
       brand_id : ['',[Validators.required]],
       title:[''],
@@ -531,11 +552,13 @@ export class EditComponent implements OnInit {
       auditReportFile:[''],
       coc: this.fb.array(['1']),
       fsc:[''],
+      sub_std_chk:[''],
+      sub_std:[''],
       project_certification:[''],
       multiple_project:this.fb.array(['1']),
       single_project: this.fb.array(['1']),
       multiple_head:[''],
-
+      sel_cb_ch:['',[Validators.required]],
       sel_process:['',[Validators.required]],
       sel_reduction:['',[Validators.required]],
       sel_standard:[''],
@@ -659,7 +682,7 @@ export class EditComponent implements OnInit {
 
   modalss:any;
   guidanceContent='';
-  openguidance(content,type) {
+  openguidance(content,type,data='') {
 
     if(type=='scopeholder')
     {
@@ -673,10 +696,23 @@ export class EditComponent implements OnInit {
     {
       this.guidanceContent='Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.';
     }
+    else if(type=='trade_field')
+    {
+      this.guidanceContent='Trade/Brand Name Field';
+    }
+    else if(type=='trade_grid')
+    {
+      this.guidanceContent='Trade/Brand Name Grid';
+    }
+    else if(type=='standard_info')
+    {
+      this.guidanceContent=data;
+    }
     else
     {
       this.guidanceContent='Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.';
     }
+    
     
     this.modalss = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title',centered: true});
     this.modalss.result.then((result) => {
@@ -833,16 +869,37 @@ export class EditComponent implements OnInit {
         }	
         }
 
-  getProductTypeOnEdit(productid,product_typeid){
-    this.loading['producttype'] = 1;
-    this.productService.getProductTypes(productid).pipe(first()).subscribe(res => {
-      this.productTypeList = res['data']; 
-      this.getProductMaterial(product_typeid,0);
-      this.loading['producttype'] = 0;
-      //this.materialList = [];
-      //this.productMaterialList = [];
-    });
-  }
+        getProductTypeOnEdit(productid,product_typeid,product_type_two_id,product_type_three_id){
+          debugger
+          this.loading['producttype'] = 1;
+          this.fscproductservice.getFscProductTypes(productid).pipe(first()).subscribe(res => {
+            this.fscproductTypeList = res['data']; 
+            
+            this.loading['producttype'] = 0;
+            //this.materialList = [];
+            //this.productMaterialList = [];
+          });
+          if(product_typeid>0)
+            {	
+              this.loading['fscproducttypeone'] = 1;
+              
+              this.fscproductservice.getFscProductTypesOne(product_typeid).pipe(first()).subscribe(res => {
+                this.fscproductTypeOneList = res['data']; 
+                this.fscproductTypeTwoList = [];
+                this.loading['fscproducttypeone'] = 0;
+              });
+            }
+      
+            if(product_type_two_id>0)
+              {	
+                this.loading['fscproducttypetwo'] = 1;
+                this.fscproductservice.getFscProductTypesTwo(product_type_two_id).pipe(first()).subscribe(res => {
+                  this.fscproductTypeTwoList = res['data']; 
+                  this.loading['fscproducttypetwo'] = 0;
+                });
+              }	
+      
+        }
 
   getStandardGrade(standardid){
 	this.labelGradeList = [];	
@@ -1344,7 +1401,7 @@ addFscProductStandard(){
     //const emailFormArray = <FormArray>this.myForm.controls.useremail;
     //const standardsFormArray = <FormArray>this.enquiryForm.get('company.standardsChk');
     const standardsFormArray = <FormArray>this.enquiryForm.get('fscChk');
-    let fscStandardDetails = this.fscStanard.find(x => x.id == id);
+    let fscStandardDetails = this.fscstandardList.find(x => x.id == id);
     this.enquiryForm.patchValue({tradeName:'',labelFsc_grade:''});
     if (isChecked) {
       standardsFormArray.push(new FormControl(id));
@@ -1368,27 +1425,30 @@ addFscProductStandard(){
   selCocStandardList:Array<any> = [{id: "1", name: "FSC-STD-40-004 V3-0" }];
   cockey = ["1"]
   onCocChange(id, value:boolean) {
-    const cocFormArray = <FormArray>this.enquiryForm.get('coc');
-    let fscStandardDetails = this.cocStandard.find(x => x.id == id);
+    // const cocStd = this.enquiryForm.get('sub_std');
+    // let fscStandardDetails = this.fscSubStandardList.find(x => x.id == id);
     // this.enquiryForm.patchValue({tradeName:'',labelFsc_grade:''});
-    if (value) {
-      cocFormArray.push(new FormControl(id));
-      this.selCocStandardList.push({id:fscStandardDetails.id,name:fscStandardDetails.name});
-    } else {
-      let index = cocFormArray.controls.findIndex(x => x.value == id);
-      cocFormArray.removeAt(index);
-      this.selCocStandardList = this.selCocStandardList.filter(x => x.id != id);
-    }
-    this.cockey= this.selCocStandardList.map(prodType => prodType.id);
+    // if (value) {
+    //   cocFormArray.push(new FormControl(id));
+    //   this.selCocStandardList.push({id:fscStandardDetails.id,name:fscStandardDetails.name,fsc_standard_id : fscStandardDetails.fsc_standard_id});
+    //   this.selCocStandardIds.push(id);
+    // } else {
+    //   let index = cocFormArray.controls.findIndex(x => x.value == id);
+    //   cocFormArray.removeAt(index);
+    //   this.selCocStandardList = this.selCocStandardList.filter(x => x.id != id);
+    //   this.selCocStandardIds = this.selCocStandardIds.filter(y => y != id);
+    // }
+    // this.cockey= this.selCocStandardList.map(prodType => prodType.id);
     // this.standardsLength = this.enquiryForm.get('fscChk').value.length;
-    
     this.cocError = ''
-    if(id ==3  && value == true) {
+    if(id ==3 && value == true) {
       this.cocSubCheck = true;
-    } else if(id==3 && value == false){
+      let substddetails = this.fscsubStandardList.find(x=>x.id==id);
+      this.sub_std_desc_title=substddetails.name;
+    } else if((id==3 && value == false) || id!=3){
       this.cocSubCheck = false;
     }
-    
+    // console.log(this.selCocStandardList);
   }
 
   singleCoc:boolean = false;
@@ -1666,220 +1726,247 @@ addFscProductStandard(){
     //this.productReset();
   }
   touchProduct(){
-    this.f.product.markAsTouched();
-    this.f.wastage.markAsTouched();
-    
-    this.f.product_type.markAsTouched();
+    this.f.productFsc.markAsTouched();
+    this.f.productFsc_type.markAsTouched();
+    this.f.productFsc_type_two.markAsTouched();
+    this.f.productFsc_type_three.markAsTouched();
   }
 
   newaddProductDetails(expobject,productIndex:any=null,passentry:any={}){
+    debugger
+   if(productIndex==null){
      
-    if(productIndex==null){
-      
-      productIndex = this.productEntries.length -1;
-      
-      let pdt_index:any = 0;//this.productListDetails.length; 
+     productIndex = this.productEntries.length -1;
+     
+     //let pdt_index = this.productListDetails.length; 
+     let pdt_index:any = 0;//this.productListDetails.length; 
 
-      if(this.productListDetails && this.productListDetails.length>0){
-        pdt_index = this.productListDetails.reduce((highestnum, curdata) => curdata.pdt_index>highestnum?curdata.pdt_index:highestnum, 0) + 1;
-      }
+     if(this.productListDetails && this.productListDetails.length>0){
+       pdt_index = this.productListDetails.reduce((highestnum, curdata) => curdata.pdt_index>highestnum?curdata.pdt_index:highestnum, 0) + 1;
+     }
       
-       
-      let selproduct:any = expobject;
-       
-        let entry = [];
-        entry["id"] = selproduct.id;
-        entry["name"] = selproduct.name;
-        entry["product_type_id"] = selproduct.product_type_id;
-        entry["product_type_name"] = selproduct.product_type_name;
-        entry["wastage"] = selproduct.wastage;
-        entry["productMaterialList"] = selproduct.productMaterialList;
-        entry["materialcompositionname"] = selproduct.materialcompositionname;
-        let prdexpobject = {...entry};
+     let selproduct:any = expobject;
+      
+       let entry = [];
+       entry["id"] = selproduct.id;
+       entry["name"] = selproduct.name;
+       entry["product_type_id"] = selproduct.product_type_id;
+       entry["product_type_name"] = selproduct.product_type_name;
+       entry["product_type_two_id"] = selproduct.product_type_two_id;
+       entry["product_type_two_name"] = selproduct.product_type_two_name;
+       entry["product_type_three_id"] = selproduct.product_type_three_id;
+       entry["product_type_three_name"] = selproduct.product_type_three_name;
+       let prdexpobject = {...entry};
 
+       
+       // selproduct.productStandardList.forEach(selstandard=>{
+       //   debugger
+       //   prdexpobject["standard_id"] = selstandard.standard_id;
+       //   prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
         
-        selproduct.productStandardList.forEach(selstandard=>{
+       //   prdexpobject["pdt_index"] = pdt_index;
+       //   prdexpobject["productIndex"] = productIndex;
+         
+       //   let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
+         
+       //   if(stdindex !== -1){
+       //     this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
+       //   }
+         
           
-          prdexpobject["standard_id"] = selstandard.standard_id;
-          prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
-          prdexpobject["label_grade"] = selstandard.label_grade;
-          prdexpobject["label_grade_name"] = selstandard.label_grade_name;
-          prdexpobject["pdt_index"] = pdt_index;
-          prdexpobject["productIndex"] = productIndex;
-          
-          let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
-          
-          if(stdindex !== -1){
-            this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-          }
-          
+       //   this.productListDetails.push({...prdexpobject});
+       //   pdt_index++;
+       // })
+       
+       prdexpobject["pdt_index"] = pdt_index;
+       this.productListDetails.push({...prdexpobject});
+   }else{
+     debugger;
+     //let pdt_index = this.productListDetails.length; 
+     let pdt_index:any = 0;//this.productListDetails.length; 
+
+     if(this.productListDetails && this.productListDetails.length>0){
+       pdt_index = this.productListDetails.reduce((highestnum, curdata) => curdata.pdt_index>highestnum?curdata.pdt_index:highestnum, 0) + 1;
+     }
+
+     let curproductEntries:any = passentry;
+     let selproduct:any = expobject;
+
+     let entry = [];
+     entry["id"] = selproduct.id;
+     entry["addition_type"] = selproduct.addition_type;
+     entry["name"] = selproduct.name;
+     entry["product_type_id"] = selproduct.product_type_id;
+     entry["product_type_name"] = selproduct.product_type_name;
+     entry["product_type_two_id"] = selproduct.product_type_two_id;
+     entry["product_type_two_name"] = selproduct.product_type_two_name;
+     entry["product_type_three_id"] = selproduct.product_type_three_id;
+     entry["product_type_three_name"] = selproduct.product_type_three_name;
+     
+     let prdexpobject:any = {...entry};
+
+       selproduct.productStandardList.forEach(selstandard=>{
+         debugger
+         let findproductEntries = curproductEntries.productStandardList.find(xx => xx.standard_id == selstandard.standard_id);
+
+         
+         if(findproductEntries===undefined){
+
            
-          this.productListDetails.push({...prdexpobject});
-          pdt_index++;
-        })
-
-        
-    }else{
-     
-      //let pdt_index = this.productListDetails.length; 
-      let pdt_index:any = 0;
-
-      if(this.productListDetails && this.productListDetails.length>0){
-        pdt_index = this.productListDetails.reduce((highestnum, curdata) => curdata.pdt_index>highestnum?curdata.pdt_index:highestnum, 0) + 1;
-      }
-
-      let curproductEntries:any = passentry;
-      let selproduct:any = expobject;
-
-      let entry = [];
-      entry["id"] = selproduct.id;
-      entry["addition_type"] = selproduct.addition_type;
-      entry["name"] = selproduct.name;
-      entry["product_type_id"] = selproduct.product_type_id;
-      entry["product_type_name"] = selproduct.product_type_name;
-      entry["wastage"] = selproduct.wastage;
-      entry["productMaterialList"] = selproduct.productMaterialList;
-      entry["materialcompositionname"] = selproduct.materialcompositionname;
-      let prdexpobject:any = {...entry};
+           //IF not in current then add in product details
 
 
+           prdexpobject["standard_id"] = selstandard.standard_id;
+           prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
+           prdexpobject["pdt_index"] =pdt_index;
+           prdexpobject["productIndex"] = productIndex;
+           
+           this.productListDetails.push({...prdexpobject});
+
+
+           let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
+           if(stdindex !== -1){
+             this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
+           }
+
+           pdt_index++;
+           
+         }else{
+           
+           let curdataentry:any = {};
+           //If Standard Present in current list
+           //selstandard -> new entry object
+
+           
+            curdataentry.id = prdexpobject.id;
+            curdataentry.name = prdexpobject.name;
+            curdataentry.product_type_id = prdexpobject.product_type_id;
+            curdataentry.product_type_name = prdexpobject.product_type_name;
+            curdataentry.product_type_two_id = prdexpobject.product_type_two_id;
+            curdataentry.product_type_two_name = prdexpobject.product_type_two_name;
+            curdataentry.product_type_three_id = prdexpobject.product_type_three_id;
+            curdataentry.product_type_three_name = prdexpobject.product_type_three_name;
+            
+            
+
+            
+
+           curdataentry.standard_id = selstandard.standard_id;
+           curdataentry.standard_name = selstandard.standard_name;//this.registrationForm.get('expname').value;
+           
+           curdataentry.pdt_index =findproductEntries.pdt_index;
+           curdataentry.productIndex = productIndex;
+           let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  findproductEntries.pdt_index);
+           
+          
+           if(listdetailsindex === -1){
+             this.productListDetails.push({...curdataentry});
+
+
+
+             
+             let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
+             if(stdindex !== -1){
+               this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
+             }
+              
+             pdt_index++;
+           }else{
+             this.productListDetails[listdetailsindex] = {...curdataentry};
+
+
+             //Update current product to all unitss..
+             this.unitEntries.forEach((val,index)=>{
+               debugger
+               if(!val.deleted){
+                 let unitProductList = val.unitProductList;
+
+                 
+                 let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == findproductEntries.pdt_index );
+                 if(unitlistpdtindex !== -1){
+                   let pdtunitlistdetails = unitProductList[unitlistpdtindex];
+                   unitProductList[unitlistpdtindex] = {...curdataentry,addition_type:pdtunitlistdetails.addition_type};
+                 }
+                 let expobject = {...val,unitProductList:unitProductList};
+                 this.unitEntries[index] = expobject;
+               }
+             });
+             
+
+           }
+           
+         }
+         
+          
+       })
 
        
 
 
-        selproduct.productStandardList.forEach(selstandard=>{
-          let findproductEntries = curproductEntries.productStandardList.find(xx => xx.standard_id == selstandard.standard_id);
-
-          
-          if(findproductEntries===undefined){
-
-            
-            //IF not in current then add in product details
-
-
-            prdexpobject["standard_id"] = selstandard.standard_id;
-            prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
-            prdexpobject["label_grade"] = selstandard.label_grade;
-            prdexpobject["label_grade_name"] = selstandard.label_grade_name;
-            prdexpobject["pdt_index"] =pdt_index;
-            prdexpobject["productIndex"] = productIndex;
-            
-            this.productListDetails.push({...prdexpobject});
+       //when standard is removed remove from list details and unit entries
+       
+       curproductEntries.productStandardList.forEach(curselstandard=>{
+         debugger
+         let findproductEntries = selproduct.productStandardList.find(xx => xx.standard_id == curselstandard.standard_id);
+         
+         if(findproductEntries===undefined){
+           let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  curselstandard.pdt_index);
+           if(listdetailsindex !== -1){
+             this.productListDetails.splice(listdetailsindex,1);
 
 
-            let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
-            if(stdindex !== -1){
-              this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-            }
-
-            pdt_index++;
-            
-          }else{
-             
-            let curdataentry:any = {};
-            //If Standard Present in current list
-            //selstandard -> new entry object
-
-              
-             curdataentry.id = prdexpobject.id;
-             curdataentry.name = prdexpobject.name;
-             curdataentry.product_type_id = prdexpobject.product_type_id;
-             curdataentry.product_type_name = prdexpobject.product_type_name;
-             curdataentry.wastage = prdexpobject.wastage;
-
-             curdataentry.productMaterialList = [...prdexpobject.productMaterialList];
-             curdataentry.materialcompositionname = prdexpobject.materialcompositionname;
- 
-            curdataentry.standard_id = selstandard.standard_id;
-            curdataentry.standard_name = selstandard.standard_name;//this.registrationForm.get('expname').value;
-            curdataentry.label_grade = selstandard.label_grade;
-            curdataentry.label_grade_name = selstandard.label_grade_name;
-            curdataentry.pdt_index =findproductEntries.pdt_index;
-            curdataentry.productIndex = productIndex;
-            let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  findproductEntries.pdt_index);
-             
-            if(listdetailsindex === -1){
-              this.productListDetails.push({...curdataentry});
+             this.unitEntries.forEach((val,index)=>{
+               debugger
+               if(!val.deleted){
+                 let unitProductList = val.unitProductList;
+                 
+                 
+                 let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == curselstandard.pdt_index );
+                 if(unitlistpdtindex !== -1){
+                   unitProductList.splice(unitlistpdtindex,1);
+                 }
+                 let expobject = {...val,unitProductList:unitProductList};
+                 this.unitEntries[index] = expobject;
+               }
+             });
 
 
+           }
+         }
 
-              
-              let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
-              if(stdindex !== -1){
-                this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-              }
-               
-              pdt_index++;
-            }else{
-              let pdtlistdetails = this.productListDetails[listdetailsindex];
-              this.productListDetails[listdetailsindex] = {...curdataentry};
+       })
+       
 
-
-              //Update current product to all unitss..
-              this.unitEntries.forEach((val,index)=>{
-                if(!val.deleted){
-                  let unitProductList = val.unitProductList;
-
-                  
-                  let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == findproductEntries.pdt_index );
-                  if(unitlistpdtindex !== -1){
-                    let pdtunitlistdetails = unitProductList[unitlistpdtindex];
-                    unitProductList[unitlistpdtindex] = {...curdataentry,addition_type:pdtunitlistdetails.addition_type};
-                  }
-                  let expobject = {...val,unitProductList:unitProductList};
-                  this.unitEntries[index] = expobject;
-                }
-              });
-              
-
-            }
-            
-          }
-          
-           
-        })
-
-        
-
-
-        //when standard is removed remove from list details and unit entries
-
-        curproductEntries.productStandardList.forEach(curselstandard=>{
-          let findproductEntries = selproduct.productStandardList.find(xx => xx.standard_id == curselstandard.standard_id);
-          
-          if(findproductEntries===undefined){
-            let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  curselstandard.pdt_index);
-            if(listdetailsindex !== -1){
-              this.productListDetails.splice(listdetailsindex,1);
-
-
-              this.unitEntries.forEach((val,index)=>{
-                if(!val.deleted){
-                  let unitProductList = val.unitProductList;
-                  
-                  
-                  let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == curselstandard.pdt_index );
-                  if(unitlistpdtindex !== -1){
-                    unitProductList.splice(unitlistpdtindex,1);
-                  }
-                  let expobject = {...val,unitProductList:unitProductList};
-                  this.unitEntries[index] = expobject;
-                }
-              });
-
-
-            }
-          }
-
-        })
-        
-
-        
-    }
      
-      
+   }
+    
+     
+ }
+ removeTrade(index :number)
+  {
+    if(index!==-1)
+     this.tradeEntries.splice(index,1);
   }
+  addTrade()
+  {
+    this.f.trade_brand.markAsTouched()
 
+    let trade_brand_name = this.enquiryForm.get('trade_brand').value;
+    if(trade_brand_name=='' || trade_brand_name===undefined || trade_brand_name===null)
+    {
+      this.enquiryForm.controls.trade_brand.setErrors({'required': true})
+    }else{
+      this.tradeEntries.push(trade_brand_name)
+      this.enquiryForm.patchValue({
+        trade_brand :''
+      })
+      this.enquiryForm.controls.trade_brand.setValidators(null)
+      this.enquiryForm.controls.trade_brand.updateValueAndValidity();
+
+      console.log(this.tradeEntries)
+    }
+   
+  }
   addProductDetails(){
     let pdt_index =0;
     this.productListDetails=[];
@@ -1911,7 +1998,7 @@ addFscProductStandard(){
     this.productIndex = index;
     
     let prd= this.productEntries[index];
-    this.getProductTypeOnEdit(prd.id,prd.product_type_id);
+    this.getProductTypeOnEdit(prd.id,prd.product_type_id,prd.product_type_two_id,prd.product_type_three_id);
     this.enquiryForm.patchValue({
       product: prd.id,
       wastage:prd.wastage,
@@ -2070,11 +2157,10 @@ addFscProductStandard(){
 
   }
   
-  filterProductStandard(stdId){
+  filterProductStandard(){
+    debugger
     const unitProductIndex = this.unitProductList.map(x=>x.pdt_index).map(String);
-    
-    return this.productListDetails.filter(x =>  stdId==x.standard_id && !unitProductIndex.includes(""+x.pdt_index+"")  );
-
+    return this.productListDetails.filter(x =>  !unitProductIndex.includes(""+x.pdt_index+"")  );
     /*
     if(this.currentunittype==1){
      
@@ -2306,16 +2392,21 @@ addFscProductStandard(){
   Unit Section Starts
   */
   filterProduct(){
+    debugger
     if(this.currentunittype==1){
-     
       let appstandards = [...this.selStandardIds];//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
       if(appstandards.length>0){
-        return this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        // this.productListDetails= this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        return this.productListDetails;
+      }else{
+        return [];
       }
     }else{
-      let appstandards = this.selUnitStandardList;//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
+      let appstandards = [...this.selUnitStandardList];//this.standardsChkDb.concat(this.enquiryForm.get('standardsChk').value);
       if(appstandards.length>0){
-        return this.productListDetails.filter(x =>  appstandards.includes(""+x.standard_id+""));
+        return this.productListDetails;
+      }else{
+        return [];
       }
     }
   }
@@ -3194,7 +3285,7 @@ addFscProductStandard(){
 
   onUnitStandardChange(id: number, isChecked: boolean) {
     
-    let standardDetails = this.selStandardList.find(x => x.id == id);
+    let standardDetails = this.selFscStandardList.find(x => x.id == id);
     
     const standardsFormArray = <FormArray>this.enquiryForm.get('unitstandardsChk');
     if (isChecked) {
@@ -3293,13 +3384,13 @@ addFscProductStandard(){
 	  
 	  let selStandardListLength = this.selStandardList.length;
 	  let selectedProductStd=[];
-	  this.productEntries.forEach((selproduct)=>{
-      selproduct.productStandardList.forEach(selstandard=>{
-        if(selectedProductStd.includes(parseInt(""+selstandard.standard_id)) === false){
-          selectedProductStd.push(parseInt(""+selstandard.standard_id));
-        }
-  		});
-	  });
+	  // this.productEntries.forEach((selproduct)=>{
+    //   selproduct.productStandardList.forEach(selstandard=>{
+    //     if(selectedProductStd.includes(parseInt(""+selstandard.standard_id)) === false){
+    //       selectedProductStd.push(parseInt(""+selstandard.standard_id));
+    //     }
+  	// 	});
+	  // });
     
     let selectedPrdStdLength = selectedProductStd.length;
     this.std_with_product_std_error = '';
@@ -3414,7 +3505,7 @@ addFscProductStandard(){
         {			
           let validity_date = this.ocb.at(index).value.validity_date;
           let certification_body = this.ocb.at(index).value.certification_body;
-          let document = this.certifiedbyothercbfiles[x.id];
+          // let document = this.certifiedbyothercbfiles[x.id];
           
           this.ocb.at(index).get("validity_date").setValidators([]);
           this.ocb.at(index).get("validity_date").updateValueAndValidity();
@@ -3423,7 +3514,7 @@ addFscProductStandard(){
           this.ocb.at(index).get("certification_body").setValidators([]);
           this.ocb.at(index).get("certification_body").updateValueAndValidity();
           this.ocb.at(index).get("certification_body").markAsTouched();
-          this.certifiedbyothercbFileError[x.id] = '';
+          // this.certifiedbyothercbFileError[x.id] = '';
           //console.log(certification_body);
 
           if((validity_date!='' && validity_date!==null) || (certification_body!='' && certification_body!==null) || (this.certifiedbyothercbfiles[x.id] && this.certifiedbyothercbfiles[x.id] !=''  && this.certifiedbyothercbfiles[x.id] !==undefined))
@@ -3436,11 +3527,11 @@ addFscProductStandard(){
             this.ocb.at(index).get("certification_body").updateValueAndValidity();
             this.ocb.at(index).get("certification_body").markAsTouched();
 
-            if(!this.certifiedbyothercbfiles[x.id] || this.certifiedbyothercbfiles[x.id] =='' || this.certifiedbyothercbfiles[x.id] === undefined)
-            {
-              this.certifiedbyothercbFileError[x.id] = 'Please upload file';
-              formerrors = true;
-            }
+            // if(!this.certifiedbyothercbfiles[x.id] || this.certifiedbyothercbfiles[x.id] =='' || this.certifiedbyothercbfiles[x.id] === undefined)
+            // {
+            //   this.certifiedbyothercbFileError[x.id] = 'Please upload file';
+            //   formerrors = true;
+            // }
             if(validity_date=='' || validity_date===null){
               formerrors = true;
             }
@@ -3487,67 +3578,32 @@ addFscProductStandard(){
 
   onSubmit(actiontype){
     
-    if(!this.validateProductWithStandard())
-  	{
-  		this.error = {summary:this.std_with_product_std_error};
-  		return false;
-    }
+    // if(!this.validateProductWithStandard())
+  	// {
+  	// 	this.error = {summary:this.std_with_product_std_error};
+  	// 	return false;
+    // }
     if(this.selFscStandardList.length >=1) {
-      if(this.cocCheck) {
-        if(this.enquiryForm.value.coc.includes('3')) {
-          if(this.cocSubCheck) {
-            if(this.enquiryForm.value.fsc == "") { 
-              this.error = {summary:this.errorSummary.errorSummaryText};
-              this.fscError = "Please select FSC";
-              return false;
-            }
-          } else {
-            this.enquiryForm.controls['fsc'].setValue("") ;          }
-        } 
+      // if(this.cocCheck) {
+      //   if(this.enquiryForm.value.coc.includes('3')) {
+      //     if(this.cocSubCheck) {
+      //       if(this.enquiryForm.value.fsc == "") { 
+      //         this.error = {summary:this.errorSummary.errorSummaryText};
+      //         this.fscError = "Please select FSC";
+      //         return false;
+      //       }
+      //     } else {
+      //       this.enquiryForm.controls['fsc'].setValue("") ;          }
+      //   } 
         
-      } else {
+      // } else {
        
-        this.enquiryForm.controls['fsc'].setValue("") ;
+      //   this.enquiryForm.controls['fsc'].setValue("") ;
         
-      }
+      // }
 
-      if(this.projectCertification) {
-        if(this.enquiryForm.value.project_certification == "") {
-          this.error = {summary:this.errorSummary.errorSummaryText};
-          this.projectCertificationError = "Please select Project Certification";
-          return false;
-        }
-
-        if (this.projectSubCertification) {
-          if(this.enquiryForm.value.multiple_head == '') {
-            this.error = {summary:this.errorSummary.errorSummaryText};
-            this.projectCertError = "Please select any one option";
-            return false;
-          }
-          debugger
-          if(this.enquiryForm.value.multiple_head == 'single' && this.enquiryForm.value.single_project.includes('2') && this.enquiryForm.value.singleCoc == "") {
-            this.error = {summary:this.errorSummary.errorSummaryText};
-            this.singleFscError = "Please select coc option";
-            return false;
-          }
-          if(this.enquiryForm.value.multiple_head == 'multiple' && this.enquiryForm.value.multiple_project.includes('2') && this.enquiryForm.value.multipleCoc == "") {
-            
-            this.error = {summary:this.errorSummary.errorSummaryText};
-            this.multipleFscError = "Please select coc option";
-            return false;
-
-          }
-
-
-
-          
-        } 
-        
-      } else {
-        this.enquiryForm.controls['project_certification'].setValue("") ;
-      }
-
-      if(this.productFscEntries.length < 1) {
+     
+      if(this.productEntries.length < 1) {
         this.std_with_product_std_error = "Please Add Product(s)"
         this.fscProductlistError = true;
         this.error = {summary:this.std_with_product_std_error};
@@ -3579,24 +3635,16 @@ addFscProductStandard(){
       form.append('unitsLists', this.unitEntries);
     };
     */
-    this.f.product.setValidators([]);
-    this.f.wastage.setValidators([]);
-    this.f.product_type.setValidators([]);
-    this.f.composition_standard.setValidators([]);
-    this.f.label_grade.setValidators([]);
-    this.f.material.setValidators([]);
-    this.f.material_type.setValidators([]);
-    this.f.material_percentage.setValidators([]);
+    this.f.productFsc.setValidators([]);
+    this.f.productFsc_type.setValidators([]);
+    this.f.productFsc_type_two.setValidators([]);
+    this.f.productFsc_type_three.setValidators([]);
     this.f.sel_process.setValidators([]);
     
-    this.f.product.updateValueAndValidity();
-    this.f.wastage.updateValueAndValidity();
-    this.f.product_type.updateValueAndValidity();
-    this.f.composition_standard.updateValueAndValidity();
-    this.f.label_grade.updateValueAndValidity();
-    this.f.material.updateValueAndValidity();
-    this.f.material_type.updateValueAndValidity();
-    this.f.material_percentage.updateValueAndValidity();
+    this.f.productFsc.updateValueAndValidity();
+    this.f.productFsc_type.updateValueAndValidity();
+    this.f.productFsc_type_two.updateValueAndValidity();
+    this.f.productFsc_type_three.updateValueAndValidity();
     this.f.sel_process.updateValueAndValidity();
     
 
@@ -3626,15 +3674,27 @@ addFscProductStandard(){
     let city = this.f.city.value;
     let tax_no = this.f.tax_no.value;
     let company_file = this.company_file;
+    let legal_rep = this.f.representative.value;
+    let official_email = this.f.official_email.value;
+    let official_website = this.f.website.value;
     let salutation = this.f.salutation.value;
     let first_name = this.f.first_name.value;
     let last_name = this.f.last_name.value;
     let job_title = this.f.job_title.value;
     let company_telephone = this.f.company_telephone.value;
     let company_email = this.f.company_email.value;
+    let sub_std = this.f.sub_std.value;
+    let fsc = this.f.sub_std_chk.value;
     let sel_brand_ch = this.f.sel_brand_ch.value;
+    let sel_cons_ch = this.f.sel_cons_ch.value;
 
     let formerrors=false;
+    this.tradeErrors = '';
+    if(this.tradeEntries.length<=0)
+    {
+      this.tradeErrors ='Please add Trade/Brand Name';
+       formerrors=true;
+    }
     let certbodyformerrors = false;
     certbodyformerrors = this.fnValidateCertificationBody();
     if(certbodyformerrors == true){
@@ -3731,12 +3791,11 @@ addFscProductStandard(){
 					}   			
         }
         */
-    if(company_name =='' || company_address=='' || zipcode=='' || country_id=='' || country_id==null || state_id==null || state_id==''
-      || city =='' || salutation=='' || first_name=='' || last_name=='' || job_title=='' || company_telephone==''
-      || company_email=='' || sel_brand_ch=='')
-    {
-      formerrors= true;
-    }
+        if(company_name =='' || company_address=='' || zipcode=='' || country_id=='' || country_id==null || state_id==null || state_id=='' || city =='' || salutation=='' || first_name=='' || last_name=='' || job_title=='' || company_telephone==''
+        || company_email=='' || sel_cons_ch=='' || sel_brand_ch=='' || legal_rep=='' || official_email=='' || official_website=='' || this.tradeEntries.length <=0 || sub_std =='' || sub_std===null || fsc=='' || fsc===null)
+      {
+        formerrors= true;
+      }
     if((this.brand_file =='' || this.brand_file==null) && this.f.sel_brand_ch.value==1 ){
       this.brandFileError ='Please upload brand file';
       formerrors=true;
@@ -3799,16 +3858,22 @@ addFscProductStandard(){
     let productdatas = [];
 
     this.productEntries.forEach((val)=>{
-      let productStandardList = [];
-      val.productStandardList.forEach((listval)=>{
-        productStandardList.push({standard_id:listval.standard_id,standard_name:listval.standard_name,label_grade:listval.label_grade,label_grade_name:listval.label_grade_name});
-      });
-      let productMaterialList=[];
-      val.productMaterialList.forEach((listval)=>{
-        productMaterialList.push({material_id:listval.material_id,material_name:listval.material_name,material_percentage:listval.material_percentage,material_type_id:listval.material_type_id,material_type_name:listval.material_type_name});
-      });
+      // let productStandardList = [];
+      // val.productStandardList.forEach((listval)=>{
+      //   productStandardList.push({standard_id:listval.standard_id,standard_name:listval.standard_name,label_grade:listval.label_grade,label_grade_name:listval.label_grade_name});
+      // });
       
-      productdatas.push({addition_type:val.addition_type,product_id:val.id,name:val.name,wastage:val.wastage,product_type:val.product_type_id,productStandardList:productStandardList,productMaterialList});
+      
+      productdatas.push({
+        addition_type:val.addition_type,
+        product_id:val.id,name:val.name,
+        product_type:val.product_type_id,
+        product_type_name:val.product_type_name,
+        product_type_two_id : val.product_type_two_id,
+        product_type_two_name:val.product_type_two_name,
+        product_type_three_id:val.product_type_three_id,
+        product_type_three_name : val.product_type_three_name
+      });
     });
     /*
     this.productListDetails.forEach((val)=>{
@@ -4015,8 +4080,8 @@ addFscProductStandard(){
           validity_date = this.errorSummary.displayDateFormat(this.ocb.at(index).value.validity_date);
         }        
 				let certification_body = this.ocb.at(index).value.certification_body;
-				let documentdata = this.certifiedbyothercbfiles[x.id]?this.certifiedbyothercbfiles[x.id]:'';
-				certifiedothercblist.push({validity_date:validity_date,certification_body:certification_body,standard_id:x.id,document:documentdata});
+				// let documentdata = this.certifiedbyothercbfiles[x.id]?this.certifiedbyothercbfiles[x.id]:'';
+				certifiedothercblist.push({validity_date:validity_date,certification_body:certification_body,standard_id:x.id});
 			}
 		});	
 	}	
@@ -4025,6 +4090,7 @@ addFscProductStandard(){
     formvalue.product_fsc = [];
     formvalue.products = [];
     formvalue.units = [];
+    formvalue.tradelist = this.tradeEntries;
     formvalue.product_fsc = this.productFscEntries;
     formvalue.products = productdatas;
     formvalue.units = unitDataEntries;
@@ -4039,6 +4105,7 @@ addFscProductStandard(){
     formvalue.app_id = this.app_id;
     formvalue.standard_addition_id = this.standard_addition_id;
     formvalue.app_checklist = expchecklist;
+    formvalue.sub_std_desc_name = fsc?this.cocSubStandard[fsc]:'';
 	if(this.ceritifedByOtherCertificationBodyFormStatus)
 	{
 		formvalue.app_certifiedothercblist = certifiedothercblist;
@@ -4170,60 +4237,33 @@ addFscProductStandard(){
   }
   productfscIndex:number;
   addFscProduct(){
-     
+    debugger
     this.f.productFsc.setValidators([Validators.required]);
-    this.f.productSubDescription.setValidators([Validators.required]);
     this.f.productFsc_type.setValidators([Validators.required]);
-    this.f.Species.setValidators([Validators.required]);
-    this.f.tradeName.setValidators([Validators.required]);
-    
+    this.f.productFsc_type_two.setValidators([Validators.required]);
+    this.f.productFsc_type_three.setValidators([Validators.required]);
+  
 
     this.f.productFsc.updateValueAndValidity();
-    this.f.productSubDescription.updateValueAndValidity();
     this.f.productFsc_type.updateValueAndValidity();
-    this.f.Species.updateValueAndValidity();
-    this.f.tradeName.updateValueAndValidity();
-
-    this.f.productFsc.markAsTouched();
-    this.f.productSubDescription.markAsTouched();
-    this.f.productFsc_type.markAsTouched();
-    this.f.Species.markAsTouched();
-    this.f.tradeName.markAsTouched();
-
-
+    this.f.productFsc_type_two.updateValueAndValidity();
+    this.f.productFsc_type_three.updateValueAndValidity();
     
     // if(this.productFscStandardList.length<=0){
 
-    //   this.f.tradeName.setValidators([Validators.required]);
-    //   // this.f.labelFsc_grade.setValidators([Validators.required]);
-
-    //   this.f.tradeName.updateValueAndValidity();
-    //   this.f.labelFsc_grade.updateValueAndValidity();
-    // }
-
-    // this.touchProduct();
-    let productId:number = this.enquiryForm.get('productFsc').value;
-    let productSubDescription = this.enquiryForm.get('productSubDescription').value;
-    let productFsc_type = this.enquiryForm.get('productFsc_type').value;
-    let Species = this.enquiryForm.get('Species').value;
-    let tradeName = this.enquiryForm.get('tradeName').value;
-    
-    
-    
-    // let materialcomposition = [];
-    // let materialcompositionname = '';
-    // let materialpercentage:any=0;
-    // if(this.productMaterialList.length > 0){
-
-    //   this.productMaterialList.forEach((val)=>{
-    //     materialcomposition.push(val.material_percentage+'% '+val.material_name);
-    //     materialpercentage = parseFloat(materialpercentage) + parseFloat(val.material_percentage);
-    //   });
-
-    //   materialcompositionname = materialcomposition.join(' + ');
+    //   this.f.fsc_composition_standard.setValidators([Validators.required]);
      
+    //   this.f.fsc_composition_standard.updateValueAndValidity();
     // }
-    this.unitvalproductErrors = '';
+
+    this.touchProduct();
+    let productId:number = this.enquiryForm.get('productFsc').value;
+   
+    let product_type = this.enquiryForm.get('productFsc_type').value;
+    let product_type_two = this.enquiryForm.get('productFsc_type_two').value;
+    let product_type_three = this.enquiryForm.get('productFsc_type_three').value;
+    
+   
     if(this.productEntries.length>0){
       
       this.productEntries.forEach((val,index) => {
@@ -4231,81 +4271,44 @@ addFscProductStandard(){
         let prodcat = val.id;
        
         if((this.productIndex!=null && this.productIndex !=index)|| this.productIndex===null ){
-          
-          //if(prodcat== productId && proddesc == product_type ){
-          //  this.unitvalproductErrors = 'Product with same Category & Description was already added';
-          //}
-        }
-          
         
-        
+        }  
       });
 
     }
     this.unitproductErrors='';
-    this.productmaterial_error = '';
-    this.productstandardgrade_error = '';
-    this.unitproductErrors = '';
-    this.productErrors = '';
-    this.wastageErrors = '';
-    let productStandardListLength = this.productFscStandardList.length;
-    let selStandardListLength = this.selStandardList.length;
-    
-	//selStandardListLength!= productStandardListLength ||
-    if(this.unitvalproductErrors != '' || productId <=0 || productId=== null || productSubDescription <=0 || productSubDescription=== null || productFsc_type <=0 || productFsc_type=== null || Species <=0 || Species=== null || tradeName <=0 || tradeName=== null  ){
-     /* if(productId<=0){
-        this.productErrors = 'Please select the Product';
-      }
-      if(wastage.trim()==''){
-        this.wastageErrors = 'Please enter the Wastage';
-      }
-      */
-      // if(materialpercentage != 100){
-      //   this.productmaterial_error = 'Total material percentage should be equal to 100';
-      // }
+
+    if(productId <=0 || productId=== null  || product_type==''|| product_type_two=='' || product_type_three==''){
+     
       // if(this.productFscStandardList.length<=0){
-      //   this.productstandardgrade_error = 'Please add trade name and label grade';
+      //   this.productstandardgrade_error = 'Please add standard';
       // }
-      // if(this.productSpeciesList.length<=0){
-      //   this.productmaterial_error = 'Please add species';
-      // }
-	  
-	  /*
-      if(selStandardListLength!= productStandardListLength){
-        this.productstandardgrade_error = 'Please add all the standard with label grade for the product';
-      }
-	  */
+     
 
       return false;
     }
-    let selproduct = this.productList.find(s => s.id ==  productId);
-    let seltrade = this.selFscStandardList.find(s => s.id ==  tradeName);
-    let selproducttype = [];
-    let selSpecies = [];
-    productFsc_type.forEach(element => {
-      selproducttype.push(this.productTypeList.find(s => s.id ==  element));
-    });
-    // Species.forEach(element => {
-    //   selSpecies.push(this.productList.find(s => s.id ==  element));
-    // });
+    let selproduct = this.fscproductList.find(s => s.id ==  productId);
+    let selproducttype = this.fscproductTypeList.find(s => s.id ==  product_type);
+    let selproducttypetwo = this.fscproductTypeOneList.find(s => s.id ==  product_type_two);
+    let selproducttypethree = this.fscproductTypeTwoList.find(s => s.id ==  product_type_three);
+    
+    
     
     let prdexpobject:any={};
 
-    if(this.productfscIndex==null){
+    if(this.productIndex==null){
       let expobject:any=[];
      
       expobject["id"] = selproduct.id;
       expobject["name"] = selproduct.name;
       
 
-      expobject["productFsc_type_id"] = selproducttype.map(prodType => prodType.id);
-      expobject["productFsc_type_name"] = selproducttype;
-      expobject["productSubDescription"] = productSubDescription;
-      expobject["Species"] = Species;
-      expobject["tradeName"] = tradeName;
-      
-      // expobject["Species"] = materialcompositionname;
-      
+      expobject["product_type_id"] = selproducttype.id;
+      expobject["product_type_name"] = selproducttype.name;
+      expobject["product_type_two_id"] = selproducttypetwo.id;
+      expobject["product_type_two_name"] = selproducttypetwo.name;
+      expobject["product_type_three_id"] = selproducttypethree.id;
+      expobject["product_type_three_name"] = selproducttypethree.name;
       //this.productListDetails.push(expobject);
       /*
       prdexpobject = {...expobject};
@@ -4324,29 +4327,28 @@ addFscProductStandard(){
       })
       */
       //this.productListDetails.push(prdexpobject);
-      // expobject["productFscStandardList"] = this.productFscStandardList;
+      // expobject["productStandardList"] = this.productFscStandardList;
       expobject["addition_type"] = 1;
       //standard_addition_id
-      this.productFscEntries.push(expobject);
+      this.productEntries.push(expobject);
       //this.addProductDetails();
-      // this.newaddProductDetails(expobject,null);
+      this.newaddProductDetails(expobject,null);
     }else{
       //let entry = this.productEntries[this.productIndex];
       let entry = [];
-      if(this.productfscIndex != -1)
+      if(this.productIndex != -1)
         this.productListDetails.splice(this.productIndex,1);
 
 
       entry["id"] = selproduct.id;
       entry["name"] = selproduct.name;
-      entry["productFsc_type_id"] = selproducttype.map(prodType => prodType.id);
-      entry["productFsc_type_name"] = selproducttype;
-      entry["productSubDescription"] = productSubDescription;
-      entry["Species"] = Species;
-      entry["tradeName"] = tradeName;
-      // entry["materialcompositionname"] = materialcompositionname;
+      entry["product_type_id"] = selproducttype.id;
+      entry["product_type_name"] = selproducttype.name;
+      entry["product_type_two_id"] = selproducttypetwo.id;
+      entry["product_type_two_name"] = selproducttypetwo.name;
+      entry["product_type_three_id"] = selproducttypethree.id;
+      entry["product_type_three_name"] = selproducttypethree.name;
 
-     
       //this.productListDetails = this.productListDetails.filter(x=>x.pdt_index!=this.productIndex);
       /*prdexpobject = {...entry};
       let pdt_index = this.productListDetails.length;
@@ -4363,40 +4365,50 @@ addFscProductStandard(){
       })
       */
       
-      // entry["productFscStandardList"] = this.productFscStandardList;
+      // entry["productStandardList"] = this.productFscStandardList;
       entry["addition_type"] = 1;
       let passentry = {...this.productEntries[this.productIndex]};
-      this.productFscEntries[this.productfscIndex] = entry;
-      this.productfscIndex = null;
+      this.productEntries[this.productIndex] = entry;
       //this.addProductDetails();
-      // this.newaddProductDetails(entry,this.productIndex,passentry);
+      this.newaddProductDetails(entry,this.productIndex,passentry);
     }
     
     let prdid = this.productMasterList.findIndex(s=>s.id==selproduct.id);
     if(prdid==-1){
       this.productMasterList.push({id:selproduct.id,name:selproduct.name});
     }
-    this.showProductFscFn();
+    this.showProductFn();
     this.unitEntries.forEach((val,index)=>{
       //let expobject = {...val,unitProductList:[]};
       //this.unitEntries[index] = expobject;
     });
     //this.productReset();
   }
+ 
 
   editFscProduct(index:number){
-    this.productfscIndex = index;
+    debugger
+    this.productIndex = index;
     //let prd= this.productListDetails[index];
-    let prd= this.productFscEntries[index];
-    this.getProductTypeOnEdit(prd.id,prd.productFsc_type_name);
+    let prd= this.productEntries[index];
+    this.getProductTypeOnEdit(prd.id,prd.product_type_id,prd.product_type_two_id,prd.product_type_three_id);
     this.enquiryForm.patchValue({
       productFsc: prd.id,
-      productSubDescription:prd.productSubDescription,
-      productFsc_type:prd.productFsc_type_id,
-      Species:prd.Species,
-      tradeName:prd.tradeName,
+      productFsc_type : prd.product_type_id,
+      productFsc_type_two : prd.product_type_two_id,
+      productFsc_type_three : prd.product_type_three_id
     });
-    this.showFscProduct = true;
+    
+    
+    
+   
+    // this.productFscStandardList = [...prd.productStandardList];//[{standard_id:prd.standard_id,standard_name:prd.standard_name,label_grade:prd.label_grade,label_grade_name:prd.label_grade_name}];
+   
+    this.showProduct = true;
+    
+
+    this.unitIndex = null;
+    this.showCert = false;
   }
 
   singleFscError = '';
