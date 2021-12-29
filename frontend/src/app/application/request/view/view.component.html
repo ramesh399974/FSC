@@ -184,7 +184,7 @@
 								<th scope="col"  style="width: 12%;">Standard</th>
 								<th scope="col"  >Certification Body</th>
 								<th scope="col" class="center" style="width: 12%;">Validity Date</th>
-								<th scope="col" >Certification File</th>
+								<!-- <th scope="col" >Certification File</th> -->
 							</tr>
 							</thead>
 							<tbody>
@@ -192,9 +192,9 @@
 									<tr>
 										<td scope="row" class="center">{{  1+ i }}</td>
 										<td >{{ application.standard_name }}</td>
-										<td >{{ application.certification_body_name }}</td>
+										<td >{{ application.certification_body }}</td>
 										<td class="center">{{ application.validity_date }}</td>
-										<td><span class="name-pad" *ngIf="application.certification_file"><a href="javascript:void(0);" (click)="downloadcertificateFile(application.id,application.certification_file);openmodal(downloading);" ><i class="fa fa-download" ></i>&nbsp;{{ application.certification_file }}</a></span></td>
+										<!-- <td><span class="name-pad" *ngIf="application.certification_file"><a href="javascript:void(0);" (click)="downloadcertificateFile(application.id,application.certification_file);openmodal(downloading);" ><i class="fa fa-download" ></i>&nbsp;{{ application.certification_file }}</a></span></td> -->
 											
 									</tr> 
 									

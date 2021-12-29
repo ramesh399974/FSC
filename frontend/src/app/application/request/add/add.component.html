@@ -789,7 +789,7 @@
 									<div class="validationerror" *ngIf="unitvalproductErrors">Product with same Category & Description was already added{{unitvalproductErrors}}</div>
 									<a class="btn btn-sm btn-success" href="javascript:void(0);" role="button" (click)="addFscProduct()"  >Save Product</a> 
 									&nbsp;&nbsp;
-									<a class="btn btn-sm btn-secondary active grey" href="javascript:void(0);" role="button" (click)="showProductFscFn()"  >Cancel</a>
+									<a class="btn btn-sm btn-secondary active grey" href="javascript:void(0);" role="button" (click)="showProductFn()"  >Cancel</a>
 								</div>
 
 								<!--	
@@ -873,7 +873,7 @@
 										<ng-container *ngIf="this.currentunittype!=1">
 											<div *ngFor="let standard of selFscStandardList; let i =index" class="col-4" >
 												<div class="checkbox">
-													<input [disabled]="(standard_addition_id && unitStandardsDisable[unit_autoid] && unitStandardsDisable[unit_autoid].includes(standard.id) ) ? true:false" id="inlineunitCheckbox{{standard.id}}" [checked]="this.selUnitStandardList.includes(standard.id)?true:false" (change)="onUnitStandardChange(standard.id, $event.target.checked);getBsectorList();" type="checkbox" [value]="standard.id">
+													<input [disabled]="(standard_addition_id && unitStandardsDisable[unit_autoid] && unitStandardsDisable[unit_autoid].includes(standard.id) ) ? true:false" id="inlineunitCheckbox{{standard.id}}" [checked]="this.selUnitStandardList.includes(''+standard.id+'')?true:false" (change)="onUnitStandardChange(standard.id, $event.target.checked);getBsectorList();" type="checkbox" [value]="standard.id">
 													<label for="inlineunitCheckbox{{ standard.id }}" >{{ standard.name }}</label>
 												</div>
 											</div>

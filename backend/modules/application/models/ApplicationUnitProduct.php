@@ -27,7 +27,7 @@ class ApplicationUnitProduct extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['unit_id', 'application_product_standard_id'], 'integer'],
+            [['unit_id', 'app_product_id'], 'integer'],
         ];
     }
 
@@ -39,7 +39,7 @@ class ApplicationUnitProduct extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'unit_id' => 'Unit ID',
-            'application_product_standard_id' => 'Product ID',
+            'app_product_id' => 'App Product ID',
         ];
     }
 

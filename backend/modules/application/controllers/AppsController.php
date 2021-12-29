@@ -1183,7 +1183,7 @@ class AppsController extends \yii\rest\Controller
 									}
 									$appunitproductmodel=new ApplicationUnitProduct();
 									$appunitproductmodel->unit_id=$appunitmodel->id;
-									$appunitproductmodel->application_product_standard_id=$pdt_id;//$pdtstdmodel->id;
+									$appunitproductmodel->app_product_id=$pdt_id;//$pdtstdmodel->id;
 									$appunitproductmodel->product_addition_type = $addition_type=="1"?1:0;
 									$appunitproductmodel->save();
 								}
@@ -1576,25 +1576,25 @@ class AppsController extends \yii\rest\Controller
 			{
 				foreach($appProduct as $prd)
 				{
+					$prd->delete();
+					// $productstandards = $prd->productstandard;
+					// if(count($productstandards)>0)
+					// {
+					// 	foreach($productstandards as $productstandard)
+					// 	{
+					// 		$productstandard->delete();	
+					// 	}
+					// }
 					
-					$productstandards = $prd->productstandard;
-					if(count($productstandards)>0)
-					{
-						foreach($productstandards as $productstandard)
-						{
-							$productstandard->delete();	
-						}
-					}
-					
-					$productmaterials = $prd->productmaterial;
-					if(count($productmaterials)>0)
-					{
-						foreach($productmaterials as $productmaterial)
-						{
-							$productmaterial->delete();	
-						}
-					}
-					$prd->delete();	
+					// $productmaterials = $prd->productmaterial;
+					// if(count($productmaterials)>0)
+					// {
+					// 	foreach($productmaterials as $productmaterial)
+					// 	{
+					// 		$productmaterial->delete();	
+					// 	}
+					// }
+					// $prd->delete();	
 
 					
 				}
@@ -1823,6 +1823,7 @@ class AppsController extends \yii\rest\Controller
 			$model->tax_no=$data['tax_no'];
 			$model->updated_by=$userData['userid'];
 			$model->is_brand = isset($data['sel_brand_ch'])?$data['sel_brand_ch']:'';
+			$model->cb_consent = isset($data['sel_cb_ch'])?$data['sel_cb_ch']:'';
 
 			if($model->validate() && $model->save())
 			{
@@ -1844,6 +1845,9 @@ class AppsController extends \yii\rest\Controller
 					$ApplicationChangeAddress->job_title=isset($data['job_title'])?$data['job_title']:"";
 					$ApplicationChangeAddress->telephone=isset($data['telephone'])?$data['telephone']:"";
 					$ApplicationChangeAddress->email_address=isset($data['email_address'])?$data['email_address']:"";
+					$ApplicationChangeAddress->official_email=isset($data['official_email'])?$data['official_email']:"";
+					$ApplicationChangeAddress->official_website=isset($data['website'])?$data['website']:"";
+					$ApplicationChangeAddress->representative=isset($data['representative'])?$data['representative']:"";
 					$ApplicationChangeAddress->save();
 				//}
 				
@@ -1862,6 +1866,21 @@ class AppsController extends \yii\rest\Controller
 				if(isset($data['sel_brand_ch']) && $data['sel_brand_ch']==2){
 					ApplicationBrands::deleteAll(['app_id'=>$data['id']]);
 				}
+
+				$tradeList=[];
+				if(isset($data['tradelist']) && is_array($data['tradelist']))
+				{
+					ApplicationTradeBrandDetails::deleteAll(['app_id'=>$data['id']]);
+					foreach($data['tradelist'] as $trd)
+					{
+						$trademod = new ApplicationTradeBrandDetails();
+						$trademod->app_id = $model->id;
+						$trademod->trade_brand_name = $trd;
+						$trademod->created_by = $userid;
+						$trademod->save();
+					}
+				}
+				
 
 				$apptype_standardaddition = 0;
 				if($model->audit_type==$model->arrEnumAuditType['standard_addition']){
@@ -1906,7 +1925,25 @@ class AppsController extends \yii\rest\Controller
 						*/
 					}
 				}
-				
+
+				if(isset($data['sub_std']) && $data['sub_std']>0)
+				{
+					$substdmod = ApplicationSubStandard::find()->where(['app_id'=>$data['id']])->one();
+					if($substdmod!==null){
+						$substdmod->sub_standard_id = $data['sub_std'];
+						$substdmod->save();
+					}	
+				}
+
+				if(isset($data['sub_std_chk']) && $data['sub_std_chk']>0 && $data['sub_std']==3)
+				{
+					$substddesmod = ApplicationSubStandardDescription::find()->where(['app_id'=>$data['id']])->one();
+					if($substddesmod!==null){
+						$substddesmod->sub_standard_desc = $data['sub_std_chk'];
+						$substddesmod->sub_standard_description_name = $data['sub_std_desc_name'];
+						$substddesmod->save();
+					}
+				}
 				if(is_array($data['app_checklist']) && count($data['app_checklist'])>0)
 				{
 					$target_dir_checklist = Yii::$app->params['application_checklist_file'];
@@ -1972,46 +2009,46 @@ class AppsController extends \yii\rest\Controller
 
 						$cbdocumentname = isset($cbFilesList[$standard_id])?$cbFilesList[$standard_id]:'';
 
-						if(isset($_FILES['certifiedbyothercb_file']['name'][$standard_id]))
-						{
-							$tmp_name = $_FILES["certifiedbyothercb_file"]["tmp_name"][$standard_id];
-				   			$name = $_FILES["certifiedbyothercb_file"]["name"][$standard_id];
-							$document=Yii::$app->globalfuns->postFiles($name,$tmp_name,$target_dir_checklist);
-							if($cbdocumentname!=''){
-								Yii::$app->globalfuns->removeFiles($cbdocumentname,$target_dir_checklist);
-							}
+						// if(isset($_FILES['certifiedbyothercb_file']['name'][$standard_id]))
+						// {
+						// 	$tmp_name = $_FILES["certifiedbyothercb_file"]["tmp_name"][$standard_id];
+				   		// 	$name = $_FILES["certifiedbyothercb_file"]["name"][$standard_id];
+						// 	$document=Yii::$app->globalfuns->postFiles($name,$tmp_name,$target_dir_checklist);
+						// 	if($cbdocumentname!=''){
+						// 		Yii::$app->globalfuns->removeFiles($cbdocumentname,$target_dir_checklist);
+						// 	}
 
-						}else{
-							$document = $value['document'];
-							if($document =='' && $cbdocumentname !=''){
-								Yii::$app->globalfuns->removeFiles($cbdocumentname,$target_dir_checklist);
-							}
-						}
+						// }else{
+						// 	$document = $value['document'];
+						// 	if($document =='' && $cbdocumentname !=''){
+						// 		Yii::$app->globalfuns->removeFiles($cbdocumentname,$target_dir_checklist);
+						// 	}
+						// }
 						if(isset($cbFilesList[$standard_id])){
 							unset($cbFilesList[$standard_id]);
 						}
 						
-						if($document !='' && $value['standard_id']!='' && $value['certification_body']!='' && $value['validity_date']!='' )
+						if( $value['standard_id']!='' && (($data['sel_cb_ch']==1 && $value['certification_body']!='' && $value['validity_date']!='') || ($data['sel_cb_ch']==2 && $value['certification_body']!='' )) )
 						{
 							$othercbmodel=new ApplicationCertifiedByOtherCB();
 							$othercbmodel->app_id=$model->id;
 							$othercbmodel->standard_id=$value['standard_id'];
 							$othercbmodel->certification_body=$value['certification_body'];
-							$othercbmodel->validity_date=date('Y-m-d',strtotime($value['validity_date']));
-							$othercbmodel->certification_file=$document;
+							$othercbmodel->validity_date=isset($value['validity_date'])?date('Y-m-d',strtotime($value['validity_date'])):'';
+							// $othercbmodel->certification_file=$document;
 							$othercbmodel->save(); 
 						}
 						
 					}
 				}
-				if(isset($cbFilesList) && count($cbFilesList)>0){
-					$target_dir_checklist = Yii::$app->params['certifiedbyothercb_file'];
-					foreach($cbFilesList as $qid => $cbdocname){
-						if($cbdocname !=''){
-							Yii::$app->globalfuns->removeFiles($cbdocname,$target_dir_checklist);
-						}
-					}
-				}
+				// if(isset($cbFilesList) && count($cbFilesList)>0){
+				// 	$target_dir_checklist = Yii::$app->params['certifiedbyothercb_file'];
+				// 	foreach($cbFilesList as $qid => $cbdocname){
+				// 		if($cbdocname !=''){
+				// 			Yii::$app->globalfuns->removeFiles($cbdocname,$target_dir_checklist);
+				// 		}
+				// 	}
+				// }
 				if(is_array($data['products']) && count($data['products'])>0)
 				{
 					foreach ($data['products'] as $value)
@@ -2046,54 +2083,63 @@ class AppsController extends \yii\rest\Controller
                         $appproductmodel->app_id=$model->id;
 						$appproductmodel->product_id=isset($value['product_id'])?$value['product_id']:"";
 						$appproductmodel->product_type_id =isset($value['product_type'])?$value['product_type']:"";
-						$appproductmodel->wastage=isset($value['wastage'])?"".$value['wastage']:"";
+						$appproductmodel->product_type_two_id = isset($value['product_type_two_id'])?$value['product_type_two_id']:"";
+						$appproductmodel->product_type_three_id = isset($value['product_type_three_id'])?$value['product_type_three_id']:"";
+						// $appproductmodel->wastage=isset($value['wastage'])?"".$value['wastage']:"";
 						$appproductmodel->product_addition_type=($apptype_standardaddition && isset($value['addition_type']) && $value['addition_type']=="1") ?1:0;
 
-						$Product = Product::find()->where(['id'=> $value['product_id']])->one();
+						$Product = FscProduct::find()->where(['id'=> $value['product_id']])->one();
 						if($Product !== null){
 							$appproductmodel->product_name = $Product->name;
 						}
-						$ProductType = ProductType::find()->where(['id'=> $value['product_type']])->one();
+						$ProductType = FscProducttypeL1::find()->where(['id'=> $value['product_type']])->one();
 						if($ProductType !== null){
 							$appproductmodel->product_type_name = $ProductType->name;
 						}
-						
-						$appproductmodel->save(); 
+						$ProductTypeTwo = FscProducttypeL2::find()->where(['id'=> $value['product_type_two_id']])->one();
+						if($ProductTypeTwo !== null){
+							$appproductmodel->product_type_two_name = $ProductTypeTwo->name;
+						}
+						$ProductTypeThree = FscProducttypeL3::find()->where(['id'=> $value['product_type_three_id']])->one();
+						if($ProductTypeThree !== null){
+							$appproductmodel->product_type_three_name = $ProductTypeThree->name;
+						}
+						$appproductmodel->save();
 						//print_r($appproductmodel->errors);
 						//print_r($value); die;
-						if(isset($value['productStandardList']) && is_array($value['productStandardList']) ){
-							foreach($value['productStandardList'] as $prdstd){
-								$appproductstandardmodel=new ApplicationProductStandard();
-								$appproductstandardmodel->standard_id=$prdstd['standard_id'];
-								$appproductstandardmodel->application_product_id=$appproductmodel->id;
-								$appproductstandardmodel->label_grade_id =$prdstd['label_grade'];
-								$StandardLabelGrade = StandardLabelGrade::find()->where(['id'=> $prdstd['label_grade']])->one();
-								if($StandardLabelGrade !== null){
-									$appproductstandardmodel->label_grade_name = $StandardLabelGrade->name;
-                                }
-								$appproductstandardmodel->save(); 
-							}
-						}
+						// if(isset($value['productStandardList']) && is_array($value['productStandardList']) ){
+						// 	foreach($value['productStandardList'] as $prdstd){
+						// 		$appproductstandardmodel=new ApplicationProductStandard();
+						// 		$appproductstandardmodel->standard_id=$prdstd['standard_id'];
+						// 		$appproductstandardmodel->application_product_id=$appproductmodel->id;
+						// 		$appproductstandardmodel->label_grade_id =$prdstd['label_grade'];
+						// 		$StandardLabelGrade = StandardLabelGrade::find()->where(['id'=> $prdstd['label_grade']])->one();
+						// 		if($StandardLabelGrade !== null){
+						// 			$appproductstandardmodel->label_grade_name = $StandardLabelGrade->name;
+                        //         }
+						// 		$appproductstandardmodel->save(); 
+						// 	}
+						// }
 						
-						if(isset($value['productMaterialList']) && is_array($value['productMaterialList']) ){
-							foreach($value['productMaterialList'] as $prdstd){
-								$appproductmaterialmodel=new ApplicationProductMaterial();
-								$appproductmaterialmodel->app_product_id=$appproductmodel->id;
-								$appproductmaterialmodel->material_id=$prdstd['material_id'];
-								$appproductmaterialmodel->material_type_id =$prdstd['material_type_id'];
-								$appproductmaterialmodel->percentage =$prdstd['material_percentage'];
-								$ProductTypeMaterialComposition = ProductTypeMaterialComposition::find()->where(['id'=> $prdstd['material_id']])->one();
-								if($ProductTypeMaterialComposition !== null){
-									$appproductmaterialmodel->material_name = $ProductTypeMaterialComposition->name;
-									if(isset($ProductTypeMaterialComposition->material_type[$prdstd['material_type_id']])){
-										$appproductmaterialmodel->material_type_name = $ProductTypeMaterialComposition->material_type[$prdstd['material_type_id']];
-									}
-								}
+						// if(isset($value['productMaterialList']) && is_array($value['productMaterialList']) ){
+						// 	foreach($value['productMaterialList'] as $prdstd){
+						// 		$appproductmaterialmodel=new ApplicationProductMaterial();
+						// 		$appproductmaterialmodel->app_product_id=$appproductmodel->id;
+						// 		$appproductmaterialmodel->material_id=$prdstd['material_id'];
+						// 		$appproductmaterialmodel->material_type_id =$prdstd['material_type_id'];
+						// 		$appproductmaterialmodel->percentage =$prdstd['material_percentage'];
+						// 		$ProductTypeMaterialComposition = ProductTypeMaterialComposition::find()->where(['id'=> $prdstd['material_id']])->one();
+						// 		if($ProductTypeMaterialComposition !== null){
+						// 			$appproductmaterialmodel->material_name = $ProductTypeMaterialComposition->name;
+						// 			if(isset($ProductTypeMaterialComposition->material_type[$prdstd['material_type_id']])){
+						// 				$appproductmaterialmodel->material_type_name = $ProductTypeMaterialComposition->material_type[$prdstd['material_type_id']];
+						// 			}
+						// 		}
 								
 								
-								$appproductmaterialmodel->save(); 
-							}
-						}
+						// 		$appproductmaterialmodel->save(); 
+						// 	}
+						// }
 						 
 					}
 				}
@@ -2144,7 +2190,7 @@ class AppsController extends \yii\rest\Controller
 
 							if(is_array($value['products']) && count($value['products'])>0)
 							{
-								foreach ($value['products'] as $val111)
+								foreach ($value['products'] as $val1)
 								{ 
 									//echo $model->id;
 									//print_r($val111);  die;
@@ -2158,46 +2204,33 @@ class AppsController extends \yii\rest\Controller
 										,'application_product_id' => $pdtdetailsmodel->id ])->one();
 									*/
 
-									$productMaterialList = $val111['productMaterialList'];
-									$queryStr = [];
-									foreach($productMaterialList as $materiall){
-										$queryStr[] = "  ( material_id = '".$materiall['material_id']."' AND material_type_id = '".$materiall['material_type_id']."' AND percentage = '".$materiall['material_percentage']."') ";
-									}
-									$totalCompCnt = count($queryStr);
-
-									$queryCondition = ' ('.implode(' OR ',$queryStr).') ';
-									
 									$connection->createCommand("set sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'")->execute();
-									$command = $connection->createCommand("SELECT  COUNT(pdt.id) as matcnt,pdt_std.id  as pdt_std_id  
+									$command = $connection->createCommand("SELECT  pdt.id  as pdt_id  
 									from tbl_application_product as pdt 
-									INNER JOIN tbl_application_product_standard as pdt_std on pdt_std.application_product_id = pdt.id 
-									INNER JOIN tbl_application_product_material as pdt_mat on pdt_mat.app_product_id = pdt.id 
 									WHERE 
-									pdt.product_id='".$val111['id']."' AND pdt.product_type_id='".$val111['product_type_id']."'
-									 AND pdt.wastage='".$val111['wastage']."' 
-									AND pdt_std.standard_id='".$val111['standard_id']."' AND pdt_std.label_grade_id='".$val111['label_grade']."' 
-									AND pdt.app_id='".$model->id."' 
-
-									AND ".$queryCondition."
-									
-									group by pdt.id HAVING matcnt=".$totalCompCnt." ");
+									pdt.product_id='".$val1['id']."' AND pdt.product_type_id='".$val1['product_type_id']."'
+									 AND pdt.product_type_two_id='".$val1['product_type_two_id']."' AND pdt.product_type_three_id='".$val1['product_type_three_id']."'					 
+									AND pdt.app_id='".$model->id."'  ");
 									$result = $command->queryOne();
-									$pdt_std_id = 0;
+									$pdt_id = 0;
 									if($result  !== false){
-										$pdt_std_id = $result['pdt_std_id'];
+										$pdt_id = $result['pdt_id'];
 									}
+									//echo $pdt_std_id.'<br><br>';
 
-									
-									$addition_type = isset($val111['addition_type']) && $val111['addition_type']=="1"?$val111['addition_type']:0;
-									if($pdt_std_id<=0){
+									//$pdt_id = $pdtlistval[$val1['pdt_index']];
+									$addition_type = $apptype_standardaddition && isset($val1['addition_type']) && $val1['addition_type']=="1"?$val1['addition_type']:0;
+
+									if($apptype_standardaddition && !$addition_type){
 										continue;
 									}
-									
-									//$pdt_id = $pdtlistval[$val1['pdt_index']];
+									if($pdt_id<=0){
+										continue;
+									}
 									$appunitproductmodel=new ApplicationUnitProduct();
 									$appunitproductmodel->unit_id=$appunitmodel->id;
-									$appunitproductmodel->application_product_standard_id=$pdt_std_id;//$pdtstdmodel->id;
-									$appunitproductmodel->product_addition_type = $apptype_standardaddition && $addition_type=="1"?1:0;
+									$appunitproductmodel->app_product_id=$pdt_id;//$pdtstdmodel->id;
+									$appunitproductmodel->product_addition_type = $addition_type=="1"?1:0;
 									$appunitproductmodel->save();
 								}
 							}
@@ -3003,10 +3036,7 @@ class AppsController extends \yii\rest\Controller
 					}
 				}
 				$resultarr["products"]=$appprdarr;
-				
-				foreach($appprdarr_details as $pdtDetailsDt){
-					$resultarr["productDetails"][] = $pdtDetailsDt;
-				}
+				$resultarr["productDetails"] = $appprdarr;
 				//$appprdarr_details;
 				
 				$unitarr=array();

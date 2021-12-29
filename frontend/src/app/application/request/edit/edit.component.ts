@@ -306,7 +306,7 @@ export class EditComponent implements OnInit {
       
       this.applicationData = res;
       
-      this.productListDetails = res.products;
+      this.productListDetails = res.productDetails;
       this.productEntries = res.products;
        if(res && res.units)
       res.units.forEach((val)=>{
@@ -1337,9 +1337,48 @@ addFscProductStandard(){
   
 
   removeFscProduct(index:number) { 
-    this.productFscEntries.splice(index,1);
-  }
+    debugger
+    let prd= this.productEntries[index];
+    
+    if(prd){
+      let pdt_index = prd.pdt_index;
+      
+      this.productEntries.splice(index,1);
 
+      
+
+
+      this.unitIndex = null;
+      this.showCert = false;
+
+
+
+      
+        
+          let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  pdt_index);
+          if(listdetailsindex !== -1){
+            this.productListDetails.splice(listdetailsindex,1);
+
+
+            this.unitEntries.forEach((val,index)=>{
+              if(!val.deleted){
+                let unitProductList = val.unitProductList;
+
+              
+                let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == pdt_index );
+                if(unitlistpdtindex !== -1){
+                  unitProductList.splice(unitlistpdtindex,1);
+                }
+                let expobject = {...val,unitProductList:unitProductList};
+                this.unitEntries[index] = expobject;
+              }
+              
+            });
+
+
+          }
+  }
+}
     
   productFscReset(){
     this.f.productFsc.setValidators([]);
@@ -1522,41 +1561,32 @@ addFscProductStandard(){
  
   
   productReset(){
-    this.f.product.setValidators([]);
-    this.f.wastage.setValidators([]);
-    this.f.product_type.setValidators([]);
-    this.f.material.setValidators([]);
-    this.f.composition_standard.setValidators([]);
-    this.f.label_grade.setValidators([]);
+    this.f.productFsc.setValidators([]);
+    this.f.productFsc_type.setValidators([]);
+    this.f.productFsc_type_two.setValidators([]);
+    this.f.productFsc_type_three.setValidators([]);
+    this.f.fsc_composition_standard.setValidators([]);
 
-    
+
     //this.enquiryForm.get('wastage').setValidators([]);
     //this.enquiryForm.controls.setErrors(null);
     this.enquiryForm.patchValue({
-      product: '',
-      wastage:'',
-      product_type:'',
-      material:'',
-      composition_standard: '',
-      label_grade:''
-      
+      productFsc: '',
+      productFsc_type: '',
+      productFsc_type_two: '',
+      productFsc_type_three: '',
+      fsc_composition_standard: '',
     });
-    this.productStandardList = [];
-    this.labelGradeList = [];
-    this.productTypeList = [];
-    this.productIndex=null;
-    this.materialList = [];
-    this.productMaterialList = [];
-    
-    this.productmaterial_error = ''; 
-    this.productErrors = '';
-    this.wastageErrors = '';
-    this.productstandard_error= '';
-    this.productstandardgrade_error='';
-    //this.enquiryForm.controls['product'].clearValidators()
-    
-    //this.enquiryForm.controls['product'].setValidators([Validators.required]);
+    this.productFscStandardList = [];
+    this.fscproductTypeList = [];
+    this.fscproductTypeOneList = [];
+    this.fscproductTypeTwoList = [];
+    this.productIndex = null;
 
+
+
+    this.productErrors = '';
+    this.productstandard_error = '';
     
   }
   productListDetails:any=[];
@@ -1777,9 +1807,11 @@ addFscProductStandard(){
        //   this.productListDetails.push({...prdexpobject});
        //   pdt_index++;
        // })
-       
+       prdexpobject["productIndex"] = productIndex;
        prdexpobject["pdt_index"] = pdt_index;
+       this.productEntries[productIndex].pdt_index=pdt_index;
        this.productListDetails.push({...prdexpobject});
+       pdt_index++;
    }else{
      debugger;
      //let pdt_index = this.productListDetails.length; 
@@ -1805,9 +1837,8 @@ addFscProductStandard(){
      
      let prdexpobject:any = {...entry};
 
-       selproduct.productStandardList.forEach(selstandard=>{
-         debugger
-         let findproductEntries = curproductEntries.productStandardList.find(xx => xx.standard_id == selstandard.standard_id);
+      
+         let findproductEntries = curproductEntries.pdt_index;
 
          
          if(findproductEntries===undefined){
@@ -1816,19 +1847,14 @@ addFscProductStandard(){
            //IF not in current then add in product details
 
 
-           prdexpobject["standard_id"] = selstandard.standard_id;
-           prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
+          //  prdexpobject["standard_id"] = selstandard.standard_id;
+          //  prdexpobject["standard_name"] = selstandard.standard_name;//this.registrationForm.get('expname').value;
            prdexpobject["pdt_index"] =pdt_index;
            prdexpobject["productIndex"] = productIndex;
            
            this.productListDetails.push({...prdexpobject});
 
-
-           let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
-           if(stdindex !== -1){
-             this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-           }
-
+           this.productEntries[productIndex].pdt_index = pdt_index;
            pdt_index++;
            
          }else{
@@ -1851,29 +1877,22 @@ addFscProductStandard(){
 
             
 
-           curdataentry.standard_id = selstandard.standard_id;
-           curdataentry.standard_name = selstandard.standard_name;//this.registrationForm.get('expname').value;
+          //  curdataentry.standard_id = selstandard.standard_id;
+          //  curdataentry.standard_name = selstandard.standard_name;//this.registrationForm.get('expname').value;
            
-           curdataentry.pdt_index =findproductEntries.pdt_index;
+           curdataentry.pdt_index =findproductEntries;
            curdataentry.productIndex = productIndex;
-           let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  findproductEntries.pdt_index);
+           let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  findproductEntries);
            
           
            if(listdetailsindex === -1){
              this.productListDetails.push({...curdataentry});
 
-
-
-             
-             let stdindex = this.productEntries[productIndex].productStandardList.findIndex(xx=>xx.standard_id == selstandard.standard_id);
-             if(stdindex !== -1){
-               this.productEntries[productIndex].productStandardList[stdindex].pdt_index = pdt_index;
-             }
-              
+             this.productEntries[productIndex].pdt_index = pdt_index; 
              pdt_index++;
            }else{
              this.productListDetails[listdetailsindex] = {...curdataentry};
-
+             this.productEntries[productIndex].pdt_index = findproductEntries;
 
              //Update current product to all unitss..
              this.unitEntries.forEach((val,index)=>{
@@ -1882,7 +1901,7 @@ addFscProductStandard(){
                  let unitProductList = val.unitProductList;
 
                  
-                 let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == findproductEntries.pdt_index );
+                 let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == findproductEntries );
                  if(unitlistpdtindex !== -1){
                    let pdtunitlistdetails = unitProductList[unitlistpdtindex];
                    unitProductList[unitlistpdtindex] = {...curdataentry,addition_type:pdtunitlistdetails.addition_type};
@@ -1896,45 +1915,42 @@ addFscProductStandard(){
            }
            
          }
-         
-          
-       })
 
        
 
 
        //when standard is removed remove from list details and unit entries
        
-       curproductEntries.productStandardList.forEach(curselstandard=>{
-         debugger
-         let findproductEntries = selproduct.productStandardList.find(xx => xx.standard_id == curselstandard.standard_id);
+      //  curproductEntries.productStandardList.forEach(curselstandard=>{
+      //    debugger
+      //    let findproductEntries = selproduct.productStandardList.find(xx => xx.standard_id == curselstandard.standard_id);
          
-         if(findproductEntries===undefined){
-           let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  curselstandard.pdt_index);
-           if(listdetailsindex !== -1){
-             this.productListDetails.splice(listdetailsindex,1);
+      //    if(findproductEntries===undefined){
+      //      let listdetailsindex = this.productListDetails.findIndex(s => s.pdt_index ==  curselstandard.pdt_index);
+      //      if(listdetailsindex !== -1){
+      //        this.productListDetails.splice(listdetailsindex,1);
 
 
-             this.unitEntries.forEach((val,index)=>{
-               debugger
-               if(!val.deleted){
-                 let unitProductList = val.unitProductList;
+      //        this.unitEntries.forEach((val,index)=>{
+      //          debugger
+      //          if(!val.deleted){
+      //            let unitProductList = val.unitProductList;
                  
                  
-                 let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == curselstandard.pdt_index );
-                 if(unitlistpdtindex !== -1){
-                   unitProductList.splice(unitlistpdtindex,1);
-                 }
-                 let expobject = {...val,unitProductList:unitProductList};
-                 this.unitEntries[index] = expobject;
-               }
-             });
+      //            let unitlistpdtindex = unitProductList.findIndex(xp=> xp.pdt_index == curselstandard.pdt_index );
+      //            if(unitlistpdtindex !== -1){
+      //              unitProductList.splice(unitlistpdtindex,1);
+      //            }
+      //            let expobject = {...val,unitProductList:unitProductList};
+      //            this.unitEntries[index] = expobject;
+      //          }
+      //        });
 
 
-           }
-         }
+      //      }
+      //    }
 
-       })
+      //  })
        
 
      
@@ -2694,6 +2710,7 @@ addFscProductStandard(){
   
   unit_autoid:any;
   editUnit(index:number){
+    debugger
     this.unitIndex = index;
 
     this.showCert = true;
@@ -3284,7 +3301,7 @@ addFscProductStandard(){
   }
 
   onUnitStandardChange(id: number, isChecked: boolean) {
-    
+    debugger
     let standardDetails = this.selFscStandardList.find(x => x.id == id);
     
     const standardsFormArray = <FormArray>this.enquiryForm.get('unitstandardsChk');
@@ -3687,7 +3704,7 @@ addFscProductStandard(){
     let fsc = this.f.sub_std_chk.value;
     let sel_brand_ch = this.f.sel_brand_ch.value;
     let sel_cons_ch = this.f.sel_cons_ch.value;
-
+    let sub_std_desc = this.cocSubStandard.find(x => x.id == fsc).name;
     let formerrors=false;
     this.tradeErrors = '';
     if(this.tradeEntries.length<=0)
@@ -4106,6 +4123,9 @@ addFscProductStandard(){
     formvalue.standard_addition_id = this.standard_addition_id;
     formvalue.app_checklist = expchecklist;
     formvalue.sub_std_desc_name = fsc?this.cocSubStandard[fsc]:'';
+    formvalue.sel_cons = (formvalue.sel_cons_ch == 1) ? formvalue.sel_cons : '';
+    formvalue.sub_std_desc_name = fsc ? sub_std_desc : '';
+    
 	if(this.ceritifedByOtherCertificationBodyFormStatus)
 	{
 		formvalue.app_certifiedothercblist = certifiedothercblist;
@@ -4336,8 +4356,8 @@ addFscProductStandard(){
     }else{
       //let entry = this.productEntries[this.productIndex];
       let entry = [];
-      if(this.productIndex != -1)
-        this.productListDetails.splice(this.productIndex,1);
+      // if(this.productIndex != -1)
+      //   this.productListDetails.splice(this.productIndex,1);
 
 
       entry["id"] = selproduct.id;
